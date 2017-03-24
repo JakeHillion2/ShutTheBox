@@ -11,8 +11,8 @@ os.chdir(dname)
 
 def has_internet():
     try:
-        with urllib.urlopen('google.com',timeout=1) as internet:
-            return(True)
+        request.urlopen('http://google.co.uk',timeout=1000)
+        return(True)
     except:
         return(False)
 
@@ -40,9 +40,10 @@ if internet_connected:
         else:
             version_nums += (len(latest_version_nums)-len(version_nums))*[0]
 
-    comp = list(zip(latest_version_nums,version_nums))
+    comp = list(zip([int(x) for x in latest_version_nums],[int(x) for x in version_nums]))
     for each in comp:
-        if comp[0]>comp[1]:
+        print(each[0],':',each[1])
+        if each[0]>each[1]:
             temp_window = tk.Tk()
             update_text = 'Your version of Shut The Box (' + version + ') is not the latest available version (' + latest_version + '). Do you wish to update the game?'
             result = tk.messagebox.askyesno('Update Available',update_text,master=temp_window)
@@ -53,12 +54,16 @@ if internet_connected:
                 break
 
 def std_dev(file_addr):
-    h_score = 162
-    l_score = 34
-    if not os.path.isfile(file_addr):
-        return(([None]*11,[None]*11),h_score,l_score)
-    with open(file_addr,'r') as file:
-        _file = file.read().split('\n')
+    h_score,l_score = 0,1000
+    if not internet_connected:
+        return((None,None,None,None))
+    try:
+        request.urlopen(file_addr+'csv_stats/')
+    except:
+        return((None,None,None,None))
+    with request.urlopen(file_addr+'csv_stats/') as file:
+        _file = file.read().decode('utf-8')
+        _file = _file.split('\n')
         _file.pop(0)
         _file.pop(len(_file)-1)
         players = [[]]*11
@@ -112,7 +117,7 @@ class ShutTheBox():
         self.debug_nums = [6,3,6,2,6,1,6,5,4,3,2,2,6,3,6,2,6,1,6,5,4,3,2,1]
         self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
         self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-240-*-*-*-*-ISO8859-1'
-        self.log_address = 'Score_Log.csv'
+        self.log_address = 'http://188.166.170.12:5000/'
         # Initialise Some Variables
         self.single_dice_on = False
         self.player_turn = 0
@@ -366,14 +371,8 @@ class ShutTheBox():
                 self.throw_dice_button.config(fg='grey')
                 self.window.update()
                 os.system('say ' + win_colour + ' has won the game')
-                if os.path.isfile(self.log_address):
-                    with open(self.log_address,'r') as file:
-                        content = file.read()
-                else:
-                    content = 'Rounds,Red,Violet Red,Yellow,Sea Green,Orange,Brown,White,Cyan,Orchid,Peru,Chartreuse\n'
-                with open(self.log_address,'w') as file:
-                    new = content + str(self.rounds) + ',' + ','.join([str(x) for x in self.player_scores]) + '\n'
-                    file.write(new)
+                if internet_connected:
+                    request.urlopen(self.log_address + 'upload_stats/' + '/'.join([str(self.rounds)] + [str(x) for x in self.player_scores]))
                 return(0)
         main_colour,secondary_colour = self.colours[self.player_turn-1][0], self.colours[self.player_turn-1][1]
         self.to_play_label.config(text=main_colour.upper()+' TO PLAY',fg=main_colour)
@@ -426,19 +425,22 @@ class ShutTheBox():
         i = 0
         boxes = []
         stdevs,averages,h_score,l_score = std_dev(self.log_address)
-        print(h_score)
-        for colour in self.colours:
-            stdev,mean = stdevs[i],averages[i]
-            _text = 'μ: ' + str(round(mean,2) if mean is not None else 'N/A') + '   -   σ: ' + str(round(stdev,2) if stdev is not None else 'N/A')
-            box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text=_text,fg=colour[0],bg='black',relief='ridge')
+        if ((stdevs is None) and (averages is None)) and ((h_score is None) and (l_score is None)):
+            box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text='No stats available.',fg='black',bg='white',relief='ridge')
             boxes.append(box)
-            i+=1
-        _text = 'High Score: ' + str(h_score)
-        box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text=_text,fg='black',bg='white',relief='ridge')
-        boxes.append(box)
-        _text = 'Low Score: ' + str(l_score)
-        box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text=_text,fg='black',bg='white',relief='ridge')
-        boxes.append(box)
+        else:
+            for colour in self.colours:
+                stdev,mean = stdevs[i],averages[i]
+                _text = 'μ: ' + str(round(mean,2) if mean is not None else 'N/A') + '   -   σ: ' + str(round(stdev,2) if stdev is not None else 'N/A')
+                box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text=_text,fg=colour[0],bg='black',relief='ridge')
+                boxes.append(box)
+                i+=1
+            _text = 'High Score: ' + str(h_score)
+            box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text=_text,fg='black',bg='white',relief='ridge')
+            boxes.append(box)
+            _text = 'Low Score: ' + str(l_score)
+            box = tk.Label(master=self.sub_window_frame,height=1,width=20,font=self.small_font,text=_text,fg='black',bg='white',relief='ridge')
+            boxes.append(box)
         i = 0
         for box in boxes:
             box.place(y=i*40+15,x=15,anchor=tk.NW)
