@@ -1,69 +1,56 @@
 import tkinter as tk
-import random,os,inspect,time
+import random,os,inspect,time,re,json,subprocess,sys
 import tkinter.simpledialog as simpledialog
 from tkinter import messagebox
 from urllib import request
-
-
-__version = '2.12'
-__grab_link = 'https://www.dropbox.com/s/3rl8ljy0615juhi/ShutTheBox2.pyw?dl=1'
-__image_link = 'https://www.dropbox.com/s/z90pz2uxqfex3i5/Splash.pgm?dl=1'
-version = __version
 
 # Move Working Directory
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-def do_update():
-    print('Downloading update...')
-    with request.urlopen(__grab_link) as response:
-        update = response.read()
-    self = inspect.getfile(inspect.currentframe())
-    print(self)
-    self = self.split('.')
-    self1 = self[0] + '.pyw'
-    self2 = self[0] + '.py'
-    print(self2)
-    self = self1
-    if os.path.isfile(self2):
-        os.remove(self2)
-    print(self)
-    with open(self,'wb') as file:
-        file.write(update)
-    temp_window = tk.Tk()
-    messagebox.showinfo('Update Complete','Update complete. Restart the game.',master=temp_window)
-    temp_window.destroy()
-    time.sleep(5)
-    exit()
+def has_internet():
+    try:
+        with urllib.urlopen('google.com',timeout=1) as internet:
+            return(True)
+    except:
+        return(False)
 
-def add_image_file():
-    print('Downloading image file...')
-    with request.urlopen(__image_link) as response:
-        image = response.read()
-    with open('Splash.pgm','wb') as file:
-        file.write(image)
+def cause_update():
+    dname = os.getcwd()
+    addr = dname + '/updater.pyw'
+    subprocess.Popen(['',addr],executable=sys.executable)
+    os._exit(1)
 
-##try:
-with request.urlopen(__grab_link) as response:
-   content = response.read()
-   content = str(content)
-   for line in content.split(r"\r"):
-       if '__version' in line:
-           splits = line.split("'")
-           act_version = splits[1].replace("\\","")
-           major,minor = act_version.split(".")
-           my_major,my_minor = __version.split(".")
-           if major>my_major:
-               do_update()
-           elif minor>my_minor:
-                do_update()
-           break
-##except:
-##    pass
+with open('.version','r') as file:
+    version = file.read()
 
-if not os.path.isfile('Splash.pgm'):
-    add_image_file()
+internet_connected = has_internet()
+
+if internet_connected:
+    query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
+    latest_version = json.loads(request.urlopen(query_address).read())['tag_name']
+
+    version_nums = re.findall(r'\d+', version)
+    latest_version_nums = re.findall(r'\d+', latest_version)
+
+    if len(version_nums)!=len(latest_version_nums):
+        if len(version_nums)>len(latest_version_nums):
+            latest_version_nums += (len(version_nums)-len(latest_version_nums))*[0]
+        else:
+            version_nums += (len(latest_version_nums)-len(version_nums))*[0]
+
+    comp = list(zip(latest_version_nums,version_nums))
+    for each in comp:
+        if comp[0]>comp[1]:
+            temp_window = tk.Tk()
+            update_text = 'Your version of Shut The Box (' + version + ') is not the latest available version (' + latest_version + '). Do you wish to update the game?'
+            result = tk.messagebox.askyesno('Update Available',update_text,master=temp_window)
+            temp_window.destroy()
+            if result:
+                cause_update()
+            else:
+                break
 
 def std_dev(file_addr):
     h_score = 162
@@ -136,7 +123,7 @@ class ShutTheBox():
         # Build The Window
         self.window = tk.Tk()
         self.main_frame = tk.Frame(master=self.window,height=600,width=800,bg='blue')
-        self.window.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - v" + version))
+        self.window.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - " + version))
         self.selection_box = tk.Frame(master=self.main_frame,height=150,width=700,bd=10,bg='blue',relief='ridge')
         self.main_frame.pack()
         self.window.update()
