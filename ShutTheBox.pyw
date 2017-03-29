@@ -29,7 +29,7 @@ internet_connected = has_internet()
 
 if internet_connected:
     query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
-    latest_version = json.loads(request.urlopen(query_address).read())['tag_name']
+    latest_version = json.loads(request.urlopen(query_address).read().decode('utf-8'))['tag_name']
 
     version_nums = re.findall(r'\d+', version)
     latest_version_nums = re.findall(r'\d+', latest_version)
