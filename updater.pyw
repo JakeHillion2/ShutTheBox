@@ -11,7 +11,7 @@ if os.path.basename(dname)!='Shut The Box':
     dname = os.getcwd()
 
 query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
-query_info = json.loads(request.urlopen(query_address).read())
+query_info = json.loads(request.urlopen(query_address).read().decode('utf-8'))
 
 tarball_url = query_info['tarball_url']
 version = query_info['tag_name']
