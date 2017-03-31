@@ -16,6 +16,9 @@ def has_internet():
     except:
         return(False)
 
+def has_updates_enabled():
+    return not os.path.isfile(".disableupdates")
+
 def cause_update():
     dname = os.getcwd()
     addr = dname + '/updater.pyw'
@@ -26,8 +29,9 @@ with open('.version','r') as file:
     version = file.read()
 
 internet_connected = has_internet()
+has_updates_enabled = has_updates_enabled()
 
-if internet_connected:
+if internet_connected and has_updates_enabled:
     query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
     latest_version = json.loads(request.urlopen(query_address).read().decode('utf-8'))['tag_name']
 
