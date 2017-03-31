@@ -17,6 +17,7 @@ def has_internet():
         return(False)
 
 def has_updates_enabled():
+    print("** UPDATES DISABLED **")
     return not os.path.isfile(".disableupdates")
 
 def cause_update():
