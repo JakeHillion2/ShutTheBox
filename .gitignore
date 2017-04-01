@@ -1,5 +1,6 @@
 Score_Log.csv
 .DS_Store
+.disableupdates
 # Created by https://www.gitignore.io/api/python
 
 ### Python ###
@@ -99,3 +100,6 @@ ENV/
 .ropeproject
 
 # End of https://www.gitignore.io/api/python
+
+# PyCharm
+.idea/
