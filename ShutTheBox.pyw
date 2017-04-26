@@ -3,48 +3,38 @@ import random,os,inspect,time,re,json,subprocess,sys
 import tkinter.simpledialog as simpledialog
 from tkinter import messagebox
 from urllib import request
-
 # Move Working Directory
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-
-def has_internet():
+def has_internet(site='http://google.co.uk'):
     try:
-        request.urlopen('http://google.co.uk',timeout=1000)
+        request.urlopen(site,timeout=1000)
         return(True)
     except:
         return(False)
-
 def has_updates_enabled():
-    print("** UPDATES DISABLED **")
     return not os.path.isfile(".disableupdates")
-
 def cause_update():
     dname = os.getcwd()
     addr = dname + '/updater.pyw'
     subprocess.Popen(['',addr],executable=sys.executable)
     os._exit(1)
-
 with open('.version','r') as file:
     version = file.read()
-
 internet_connected = has_internet()
 updates_enabled = has_updates_enabled()
-
-if internet_connected and updates_enabled:
+if internet_connected and updates_enabled and has_internet('https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'):
+    print('Checking for updates...')
     query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
     latest_version = json.loads(request.urlopen(query_address).read().decode('utf-8'))['tag_name']
-
     version_nums = re.findall(r'\d+', version)
     latest_version_nums = re.findall(r'\d+', latest_version)
-
     if len(version_nums)!=len(latest_version_nums):
         if len(version_nums)>len(latest_version_nums):
             latest_version_nums += (len(version_nums)-len(latest_version_nums))*[0]
         else:
             version_nums += (len(latest_version_nums)-len(version_nums))*[0]
-
     comp = list(zip([int(x) for x in latest_version_nums],[int(x) for x in version_nums]))
     for each in comp:
         print(each[0],':',each[1])
@@ -57,10 +47,9 @@ if internet_connected and updates_enabled:
                 cause_update()
             else:
                 break
-
 def std_dev(file_addr):
     h_score,l_score = 0,1000
-    if not internet_connected:
+    if not (internet_connected and has_internet(file_addr+'csv_stats/')):
         return((None,None,None,None))
     try:
         request.urlopen(file_addr+'csv_stats/')
@@ -159,7 +148,6 @@ class ShutTheBox():
         self.dice1label.place(x=10,y=50)
         self.dice2label = tk.Label(master=self.main_frame,width=2,height=1,bd=5,relief='ridge',text=' ',font=self.font,bg='red',fg='white')
         self.dice2label.place(x=82,y=50)
-
         # Player Score Labels
         self.score_labels = []
         self.player_scores = [0]*self.players
@@ -168,43 +156,34 @@ class ShutTheBox():
             text_colour = self.colours[i][1]
             self.score_labels.append(tk.Label(master=self.main_frame,width=4,height=1,bd=5,relief='ridge',text='0',font=self.small_font,bg=colour,fg=text_colour))
             self.score_labels[len(self.score_labels)-1].place(x=723,y=8+49*i)
-
         # To Play Label
         self.to_play_label = tk.Label(master=self.main_frame,height=1,text='RED TO PLAY',font=self.font,bg='blue',fg='red')
         self.to_play_label.place(x=440,y=40,anchor=tk.CENTER)
-
         # Round Label
         self.round_label = tk.Label(master=self.main_frame,height=1,text='ROUND 1 OF 5',font=self.small_font,bg='blue',fg='red')
         self.round_label.place(x=440,y=140,anchor=tk.CENTER)
-
         # Exit Button
         self.exit_button = tk.Label(master=self.main_frame,height=1,width=6,bd=3,bg='black',fg='yellow',relief='ridge',text='Exit',font=self.small_font)
         self.exit_button.place(x=790,y=590,anchor=tk.SE)
         self.exit_button.bind("<Button-1>", self.close_window)
-
         # New Game Button
         self.new_game_button = tk.Label(master=self.main_frame,height=1,width=10,bd=3,bg='black',fg='yellow',relief='ridge',text='New Game',font=self.small_font)
         self.new_game_button.place(x=10,y=590,anchor=tk.SW)
         self.new_game_button.bind("<Button-1>", self.new_game)
-
         # End Turn Button
         self.end_turn_button = tk.Label(master=self.main_frame,height=1,width=8,bd=3,bg='black',fg='yellow',relief='ridge',text='End Turn',font=self.small_font)
         self.end_turn_button.place(x=165,y=590,anchor=tk.SW)
         self.end_turn_button.bind("<Button-1>", self.move_on_turn)
-
         # Throw Dice Button
         self.throw_dice_button = tk.Label(master=self.main_frame,height=1,width=10,bd=3,bg='black',fg='yellow',relief='ridge',text='Throw Dice',font=self.small_font)
         self.throw_dice_button.place(x=10,y=10,anchor=tk.NW)
         self.throw_dice_button.bind("<Button-1>", self.throw_dice_animation)
-
         # Show Stats Button
         self.show_stats_button = tk.Label(master=self.main_frame,height=1,width=10,bd=3,bg='black',fg='yellow',relief='ridge',text='Show Stats',font=self.small_font)
         self.show_stats_button.place(x=680,y=590,anchor=tk.SE)
         self.show_stats_button.bind("<Button-1>", self.show_stats)
-
         # Single Dice Mode Checkbox
         self.toggle_single_dice_checkbox = tk.Checkbutton(master=self.main_frame,text='Enable Single Dice Mode',bg='blue',fg='white',variable=self.single_dice_var,command=self.on_single_dice_change)
-
         # Number Boxes
         self.number_labels = []
         self.selection_buttons = []
@@ -216,36 +195,28 @@ class ShutTheBox():
             self.number_labels[len(self.number_labels)-1].bind('<Button-1>',self.number_clicked_function,i)
             self.selection_buttons.append(tk.Label(master=self.selection_box,width=2,height=1,bd=3,relief='ridge',text='',font=self.font,bg='blue',fg='red'))
             self.selection_buttons[len(self.selection_buttons)-1].grid(row=1,column=i)
-
         # Begin the Game
         self.round_label.config(text=self.gen_round_text())
         self.next_turn()
-
         # Main Loop
         self.window.mainloop()
-
     def close_window(self,x):
         if tk.messagebox.askokcancel('Exit Game','Are you sure you wish to exit?'):
             self.window.destroy()
-
     def new_game(self,x):
         if tk.messagebox.askokcancel('Start New Game','Are you sure you wish to start a new game?'):
             self.window.destroy()
             self.__init__()
-
     def move_on_turn(self,x):
         if tk.messagebox.askokcancel('End Turn','Are you sure you wish to end this turn?'):
             self.next_turn()
-
     def gen_round_text(self):
         return('ROUND ' + str(self.round) + ' OF ' + str(self.rounds))
-
     def single_dice_option(self,val):
         if val:
             self.toggle_single_dice_checkbox.place(x=10,y=120)
         else:
             self.toggle_single_dice_checkbox.place_forget()
-
     def number_clicked_function(self,n):
         if type(n)==tk.Event:
             num = int(self.number_labels.index(n.widget)+1)
@@ -333,7 +304,6 @@ class ShutTheBox():
             if not x>0:
                 self.awaiting_number = True
                 self.set_available(r1,r2)
-
     def set_available(self,r1,r2):
         self.acceptable_inputs = []
         if (r1 in self.board) and (r2 in self.board) and (r1!=r2):
@@ -351,12 +321,10 @@ class ShutTheBox():
             self.awaiting_number = False
             self.window.after(1200,self.next_turn)
         print(self.acceptable_inputs)
-
     def update_scores(self):
         for i in range(0,len(self.score_labels)):
             self.score_labels[i].config(text=self.player_scores[i])
         self.window.update()
-
     def next_turn(self):
         self.player_turn += 1
         if self.player_turn>self.players:
@@ -376,7 +344,7 @@ class ShutTheBox():
                 self.throw_dice_button.config(fg='grey')
                 self.window.update()
                 os.system('say ' + win_colour + ' has won the game')
-                if internet_connected:
+                if internet_connected and has_internet(self.log_address):
                     request.urlopen(self.log_address + 'upload_stats/' + '/'.join([str(self.rounds)] + [str(x) for x in self.player_scores]))
                 return(0)
         main_colour,secondary_colour = self.colours[self.player_turn-1][0], self.colours[self.player_turn-1][1]
@@ -394,7 +362,6 @@ class ShutTheBox():
         self.board = [1,2,3,4,5,6,7,8,9]
         self.throw_dice_button.config(fg=main_colour)
         self.window.update()
-
     def reset_board(self):
         main_colour,secondary_colour = self.colours[self.player_turn-1][0], self.colours[self.player_turn-1][1]
         for i in self.selection_buttons:
@@ -402,7 +369,6 @@ class ShutTheBox():
         for i in self.number_labels:
             i.config(fg=main_colour)
         self.reset_selector_buttons()
-
     def on_single_dice_change(self):
         if self.single_dice_var.get()==1:
             print('Toggling single dice mode on')
@@ -412,16 +378,13 @@ class ShutTheBox():
             print('Toggling single dice mode off')
             self.dice2label.place(x=82,y=50)
             self.single_dice_on = False
-
     def reset_selector_buttons(self):
         for i in self.selection_buttons:
             i.config(text=' ')
         for i in range(1,10):
             self.number_labels[i-1].config(text=i,bg='black')
-
     def do_nothing(*args):
         pass
-
     def show_stats(self,x):
         self.sub_window = tk.Tk()
         self.sub_window_frame = tk.Frame(master=self.sub_window,height=540,width=295,bg='blue')
@@ -461,5 +424,5 @@ class ShutTheBox():
             self.number_clicked_function(event.char)
         else:
             print("pressed", repr(event.char))
-
 test = ShutTheBox()
+
