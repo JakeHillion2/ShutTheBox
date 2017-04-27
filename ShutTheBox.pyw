@@ -9,7 +9,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 def has_internet(site='http://google.co.uk'):
     try:
-        request.urlopen(site,timeout=1000)
+        request.urlopen(site,timeout=1)
         return(True)
     except:
         return(False)
