@@ -122,6 +122,8 @@ class ShutTheBox():
         ]
         self.debug = False
         self.debug_nums = [6, 3, 6, 2, 6, 1, 6, 5, 4, 3, 2, 2, 6, 3, 6, 2, 6, 1, 6, 5, 4, 3, 2, 1]
+        self.name_font = '-*-Microsoft Sans Serif-Normal-R-*--*-700-*-*-*-*-ISO8859-1'
+        self.sub_font = '-*-Microsoft Sans Serif-Normal-R-*--*-400-*-*-*-*-ISO8859-1'
         self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
         self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-240-*-*-*-*-ISO8859-1'
         self.log_address = 'http://188.166.170.12:5000/'
@@ -132,6 +134,114 @@ class ShutTheBox():
         self.round = 1
         self.awaiting_number = False
         self.acceptable_inputs = []
+
+        self.players, self.rounds = None, None
+        self.options_complete = False
+        while not self.options_complete:
+            self.menu = tk.Tk()
+            self.menu.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - " + version))
+            self.options_menu_frame = tk.Frame(master=self.menu, height=750, width=500, bg='blue')
+            self.options_menu_frame.pack()
+            self.menu.resizable(False, False)
+            self.name_text = tk.Label(master=self.menu, text='Shut the Box', bg='blue', fg='yellow',
+                                      font=self.name_font)
+            self.name_text.place(x=45, y=10)
+            self.rules_button = tk.Label(master=self.menu, text='The Rules', bg='black', fg='yellow', relief='ridge',
+                                         font=self.small_font, height=1, bd=3, width=9)
+            self.rules_button.bind('<Button-1>', self.display_rules)
+            self.rules_button.place(x=50, y=125)
+
+            self.dissable_dice_animation_button_var = False
+
+            self.dissable_dice_animation_button = tk.Label(master=self.menu, text='Disable Dice Roll Animation',
+                                                           bg='black', fg='yellow', relief='ridge',
+                                                           font=self.small_font, height=1, bd=3, width=23)
+            self.dissable_dice_animation_button.bind('<Button-1>', self.disable_roll_animation_clicked)
+            self.dissable_dice_animation_button.place(x=50, y=165)
+
+            self.player_count_text = tk.Label(master=self.menu, text='Select Number of Players', bg='blue',
+                                              fg='yellow', font=self.sub_font)
+            self.player_count_text.place(x=27, y=250)
+            # Player Count Boxes
+            self.player_count_button = []
+            self.player_box = tk.Frame(master=self.menu, height=150, width=700, bd=5, bg='blue',
+                                       relief='ridge')
+            self.player_box.place(x=250, y=400, anchor=tk.CENTER)
+            row = 0
+            drop_column = 1
+            for i in range(1, 12):
+                column = i
+                if i == 7:
+                    row = 1
+                if i >= 7:
+                    column = drop_column
+                    drop_column = drop_column + 1
+                self.player_count_button.append(
+                    tk.Label(master=self.player_box, width=2, height=1, bd=5, relief='ridge', text=i, font=self.font,
+                             bg='black', fg='yellow'))
+                self.player_count_button[len(self.player_count_button) - 1].grid(row=row, column=column)
+                self.player_count_button[len(self.player_count_button) - 1].bind('<Button-1>',
+                                                                                 self.player_button_clicked, i)
+            # Round Boxes
+            self.round_button = []
+            self.round_box = tk.Frame(master=self.menu, height=150, width=700, bd=5, bg='blue',
+                                      relief='ridge')
+            self.round_box.place(x=250, y=600, anchor=tk.CENTER)
+            for i in range(1, 6):
+                self.round_button.append(
+                    tk.Label(master=self.round_box, width=2, height=1, bd=5, relief='ridge', text=i, font=self.font,
+                             bg='black', fg='yellow'))
+                self.round_button[len(self.round_button) - 1].grid(row=0, column=i)
+                self.round_button[len(self.round_button) - 1].bind('<Button-1>',
+                                                                   self.round_button_clicked, i)
+
+            self.round_text = tk.Label(master=self.menu, text='Rounds', font=self.sub_font, bg='blue', fg='yellow')
+            self.round_text.place(x=175, y=500)
+
+            self.start_button = tk.Label(master=self.menu, text='Start Game', height=1, relief='ridge', bd=3, width=9,
+                                         bg='black', fg='yellow', font=self.small_font)
+            self.start_button.bind('<Button-1>', self.game_start_check)
+            self.start_button.place(x=285, y=700)
+
+            self.exit_button_2 = tk.Label(master=self.menu, text='Exit', height=1, relief='ridge', bd=3, width=4,
+                                          bg='black', fg='yellow', font=self.small_font)
+            self.exit_button_2.bind('<Button-1>', self.menu_quit)
+            self.exit_button_2.place(x=425, y=700)
+
+            self.options_complete = True
+
+            self.menu.mainloop()
+
+    def disable_roll_animation_clicked(self, *args):
+        if self.dissable_dice_animation_button_var == False:
+            self.dissable_dice_animation_button_var = True
+            self.dissable_dice_animation_button.config(fg='grey')
+        else:
+            self.dissable_dice_animation_button_var = False
+            self.dissable_dice_animation_button.config(fg='yellow')
+
+    def menu_quit(self, *args):
+        if tk.messagebox.askokcancel(title='Quit Confirm', message='Are you Sure you want to Quit!'):
+            self.menu.destroy()
+
+    def game_start_check(self, *args):
+        issue = ''
+        self.issues = False
+        if self.players == None or self.players > 11 or self.players < 2:
+            self.issues = True
+            issue += 'You need to select between 2 and 11 players!\n'
+        if self.rounds == None:
+            self.issues = True
+            issue += '\nYou need to select the amount of rounds you want to play!'
+
+        if self.issues:
+            tk.messagebox.askretrycancel('Ops!', message=issue)
+        else:
+            self.menu.destroy()
+            self.start_game()
+
+    def start_game(self, *args):
+        ###
         # Build The Window
         self.window = tk.Tk()
         self.main_frame = tk.Frame(master=self.window, height=600, width=800, bg='blue')
@@ -145,19 +255,11 @@ class ShutTheBox():
         self.window.update()
         self.single_dice_var = tk.IntVar()
         self.single_dice_var.set(0)
-        # Bind Keyboard Inputs
         self.window.bind("<Key>", self.key)
-        # Ask for players and rounds
-        self.players, self.rounds = None, None
-        while self.players is None:
-            self.players = simpledialog.askinteger(title='Number of Players',
-                                                   prompt='Enter the number of players (2-11)', parent=self.window,
-                                                   minvalue=2, maxvalue=11)
-        while self.rounds is None:
-            self.rounds = simpledialog.askinteger(title='Number of Rounds', prompt='Enter the number of rounds (1-5)',
-                                                  parent=self.window, minvalue=1, maxvalue=5)
+        ###
         # Destroy the splash screen
-        self.splash_label.place_forget()
+        time.sleep(2)
+        self.splash_label. place_forget()
         # Render the content
         # Dice Labels
         self.dice1label = tk.Label(master=self.main_frame, width=2, height=1, bd=5, relief='ridge', text=' ',
@@ -233,6 +335,10 @@ class ShutTheBox():
         # Main Loop
         self.window.mainloop()
 
+    def display_rules(self, *args):
+        tk.messagebox.askretrycancel('Rules',
+                                     message='One day the rules will be here!')
+
     def close_window(self, x):
         if tk.messagebox.askokcancel('Exit Game', 'Are you sure you wish to exit?'):
             self.window.destroy()
@@ -241,6 +347,32 @@ class ShutTheBox():
         if tk.messagebox.askokcancel('Start New Game', 'Are you sure you wish to start a new game?'):
             self.window.destroy()
             self.__init__()
+
+    def player_button_clicked(self, n):
+        if type(n) == tk.Event:
+            num = int(self.player_count_button.index(n.widget) + 1)
+        else:
+            num = int(n)
+        self.player_count_select(num)
+
+    def round_button_clicked(self, n):
+        if type(n) == tk.Event:
+            num = int(self.round_button.index(n.widget) + 1)
+        else:
+            num = int(n)
+        self.round_select(num)
+
+    def round_select(self, num):
+        if not self.rounds == None:
+            self.round_button[self.rounds - 1].config(fg='yellow')
+        self.round_button[num - 1].config(fg='grey')
+        self.rounds = num
+
+    def player_count_select(self, num):
+        if not self.players == None:
+            self.player_count_button[self.players - 1].config(fg='yellow')
+        self.player_count_button[num - 1].config(fg='grey')
+        self.players = num
 
     def move_on_turn(self, x):
         if tk.messagebox.askokcancel('End Turn', 'Are you sure you wish to end this turn?'):
@@ -301,15 +433,22 @@ class ShutTheBox():
             self.throw_dice_button.config(fg='grey')
             if self.single_dice_on:
                 print('Single dice throw called')
-                self.dice1label.config(text=random.randint(1, 6))
-                self.window.update()
-                self.throw_dice_button.after(40, self.throw_dice_animation, 10, 1)
+                if self.dissable_dice_animation_button_var:
+                    self.throw_dice_button.after(40, self.throw_dice_animation, 0, 1)
+                else:
+                    self.dice1label.config(text=random.randint(1, 6))
+                    self.window.update()
+                    self.throw_dice_button.after(40, self.throw_dice_animation, 10, 1)
             else:
                 print('Double dice throw called')
-                self.dice1label.config(text=random.randint(1, 6))
-                self.dice2label.config(text=random.randint(1, 6))
-                self.window.update()
-                self.throw_dice_button.after(40, self.throw_dice_animation, 10, 0)
+                if self.dissable_dice_animation_button_var:
+                    self.throw_dice_button.after(40, self.throw_dice_animation, 0, 0)
+                else:
+                    self.dice1label.config(text=random.randint(1, 6))
+                    self.dice2label.config(text=random.randint(1, 6))
+                    self.window.update()
+
+                    self.throw_dice_button.after(40, self.throw_dice_animation, 10, 0)
         else:
             if y == 0:
                 # Double throw
