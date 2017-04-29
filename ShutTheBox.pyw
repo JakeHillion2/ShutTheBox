@@ -524,6 +524,8 @@ class ShutTheBox():
         self.window.update()
 
     def next_turn(self):
+        self.acceptable_inputs = []
+        self.awaiting_number = False
         self.player_turn += 1
         if self.player_turn > self.players:
             self.player_turn = 1
