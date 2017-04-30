@@ -125,13 +125,13 @@ class OptionsScreen():
         self.rules_button.bind('<Button-1>', self.display_rules)
         self.rules_button.place(x=50, y=125)
 
-        self.dissable_dice_animation_button_var = False
+        self.disable_dice_animation_button_var = False
 
-        self.dissable_dice_animation_button = tk.Label(master=self.menu, text='Disable Dice Roll Animation',
+        self.disable_dice_animation_button = tk.Label(master=self.menu, text='Disable Dice Roll Animation',
                                                        bg='black', fg='yellow', relief='ridge',
                                                        font=main_class.small_font, height=1, bd=3, width=23)
-        self.dissable_dice_animation_button.bind('<Button-1>', self.disable_roll_animation_clicked)
-        self.dissable_dice_animation_button.place(x=50, y=165)
+        self.disable_dice_animation_button.bind('<Button-1>', self.disable_roll_animation_clicked)
+        self.disable_dice_animation_button.place(x=50, y=165)
 
         self.player_count_text = tk.Label(master=self.menu, text='Select Number of Players', bg='blue',
                                           fg='yellow', font=main_class.sub_font)
@@ -187,15 +187,17 @@ class OptionsScreen():
         self.menu.mainloop()
 
     def disable_roll_animation_clicked(self, *args):
-        if self.dissable_dice_animation_button_var == False:
-            self.dissable_dice_animation_button_var = True
-            self.dissable_dice_animation_button.config(fg='grey')
+        if self.disable_dice_animation_button_var == False:
+            self.disable_dice_animation_button_var = True
+            self.disable_dice_animation_button.config(fg='grey')
         else:
-            self.dissable_dice_animation_button_var = False
-            self.dissable_dice_animation_button.config(fg='yellow')
+            self.disable_dice_animation_button_var = False
+            self.disable_dice_animation_button.config(fg='yellow')
+
+        print("Disable dice roll", self.disable_dice_animation_button_var)
 
     def menu_quit(self, *args):
-        if tk.messagebox.askokcancel(title='Quit Confirm', message='Are you Sure you want to Quit!'):
+        if tk.messagebox.askokcancel(title='Quit Confirm', message='Are you Sure you want to Quit?'):
             self.menu.destroy()
 
     def game_start_check(self, *args):
@@ -212,7 +214,7 @@ class OptionsScreen():
             tk.messagebox.askretrycancel('Oops!', message=issue)
         else:
             self.menu.destroy()
-            self.main_class.absorb_settings(self.rounds,self.players,self.dissable_dice_animation_button_var)
+            self.main_class.absorb_settings(self.rounds,self.players,self.disable_dice_animation_button_var)
 
     def display_rules(self, *args):
         tk.messagebox.askretrycancel('Rules',
@@ -280,11 +282,11 @@ class ShutTheBox():
 
         options_screen = OptionsScreen(self)
 
-    def absorb_settings(self,rounds,players,enable_roll_animation):
+    def absorb_settings(self,rounds,players,disable_roll_animation):
         print(rounds,players)
         self.rounds = rounds
         self.players = players
-        self.enable_roll_animation = enable_roll_animation
+        self.disable_roll_animation = disable_roll_animation
         self.start_game()
     
     def start_game(self, *args):
@@ -445,13 +447,13 @@ class ShutTheBox():
             print(num, 'was clicked unwantingly')
 
     def throw_dice_animation(self, x, y=0):
-        #self.enable_roll_animation
+        #self.disable_roll_animation
         if (type(x) is tk.Event) or (x is None):
             self.throw_dice_button.bind("<Button-1>", self.do_nothing)
             self.throw_dice_button.config(fg='grey')
             if self.single_dice_on:
                 print('Single dice throw called')
-                if self.enable_roll_animation:
+                if self.disable_roll_animation:
                     self.throw_dice_button.after(40, self.throw_dice_animation, 0, 1)
                 else:
                     self.dice1label.config(text=random.randint(1, 6))
@@ -459,7 +461,7 @@ class ShutTheBox():
                     self.throw_dice_button.after(40, self.throw_dice_animation, 10, 1)
             else:
                 print('Double dice throw called')
-                if self.enable_roll_animation:
+                if self.disable_roll_animation:
                     self.throw_dice_button.after(40, self.throw_dice_animation, 0, 0)
                 else:
                     self.dice1label.config(text=random.randint(1, 6))
