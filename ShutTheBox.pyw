@@ -3,6 +3,7 @@ import random, os, inspect, time, re, json, subprocess, sys
 import tkinter.simpledialog as simpledialog
 from tkinter import messagebox
 from urllib import request
+from webbrowser import open as wbopen
 
 # Move Working Directory
 abspath = os.path.abspath(__file__)
@@ -217,8 +218,7 @@ class OptionsScreen():
             self.main_class.absorb_settings(self.rounds,self.players,self.disable_dice_animation_button_var)
 
     def display_rules(self, *args):
-        tk.messagebox.askretrycancel('Rules',
-                                     message='One day the rules will be here!')
+        wbopen('https://shutthebox.club/the-game/')
 
     def player_button_clicked(self, n):
         if type(n) == tk.Event:
