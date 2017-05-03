@@ -152,9 +152,10 @@ class OptionsScreen():
             if i >= 7:
                 column = drop_column
                 drop_column = drop_column + 1
+            main_colour,secondary_colour = self.main_class.colours[i-1]
             self.player_count_button.append(
                 tk.Label(master=self.player_box, width=2, height=1, bd=5, relief='ridge', text=i, font=main_class.font,
-                         bg='black', fg='yellow'))
+                         bg=main_colour, fg=secondary_colour))
             self.player_count_button[len(self.player_count_button) - 1].grid(row=row, column=column)
             self.player_count_button[len(self.player_count_button) - 1].bind('<Button-1>',
                                                                              self.player_button_clicked, i)
@@ -177,7 +178,7 @@ class OptionsScreen():
         self.start_button = tk.Label(master=self.menu, text='Start Game', height=1, relief='ridge', bd=3, width=9,
                                      bg='black', fg='yellow', font=main_class.small_font)
         self.start_button.bind('<Button-1>', self.game_start_check)
-        self.start_button.place(x=285, y=700)
+        self.start_button.place(x=285, y=0)
 
         self.exit_button_2 = tk.Label(master=self.menu, text='Exit', height=1, relief='ridge', bd=3, width=4,
                                       bg='black', fg='yellow', font=main_class.small_font)
@@ -219,7 +220,12 @@ class OptionsScreen():
             self.main_class.absorb_settings(self.rounds, self.players, self.show_dice_animation_button_var)
 
     def display_rules(self, *args):
+<<<<<<< HEAD
         wbopen('https://shutthebox.club/the-game/')
+=======
+        tk.messagebox.showinfo('Rules',
+                                     message='One day the rules will be here!')
+>>>>>>> upstream/master
 
     def player_button_clicked(self, n):
         if type(n) == tk.Event:
@@ -242,11 +248,17 @@ class OptionsScreen():
         self.rounds = num
 
     def player_count_select(self, num):
-        if not self.players == None:
-            self.player_count_button[self.players - 1].config(fg='yellow')
+        self.reset_colours()
         self.player_count_button[num - 1].config(fg='grey')
         self.players = num
 
+<<<<<<< HEAD
+=======
+    def reset_colours(self):
+        for i in range(11):
+            main_colour,secondary_colour = self.main_class.colours[i]
+            self.player_count_button[i].config(fg=secondary_colour)
+>>>>>>> upstream/master
 
 class ShutTheBox():
     def __init__(self):
