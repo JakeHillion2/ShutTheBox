@@ -116,7 +116,7 @@ class OptionsScreen():
 
         self.menu = tk.Tk()
         self.menu.wm_title("Shut The Box - Setup")
-        self.options_menu_frame = tk.Frame(master=self.menu, height=750, width=500, bg='blue')
+        self.options_menu_frame = tk.Frame(master=self.menu, height=615, width=500, bg='blue')
         self.options_menu_frame.pack()
         self.menu.resizable(False, False)
         self.name_text = tk.Label(master=self.menu, text='Shut the Box', bg='blue', fg='yellow',
@@ -137,12 +137,12 @@ class OptionsScreen():
 
         self.player_count_text = tk.Label(master=self.menu, text='Select Number of Players', bg='blue',
                                           fg='yellow', font=main_class.sub_font)
-        self.player_count_text.place(x=27, y=250)
+        self.player_count_text.place(x=27, y=215)
         # Player Count Boxes
         self.player_count_button = []
         self.player_box = tk.Frame(master=self.menu, height=150, width=700, bd=5, bg='blue',
                                    relief='ridge')
-        self.player_box.place(x=250, y=400, anchor=tk.CENTER)
+        self.player_box.place(x=250, y=350, anchor=tk.CENTER)
         row = 0
         drop_column = 1
         for i in range(1, 12):
@@ -152,7 +152,7 @@ class OptionsScreen():
             if i >= 7:
                 column = drop_column
                 drop_column = drop_column + 1
-            main_colour,secondary_colour = self.main_class.colours[i-1]
+            main_colour, secondary_colour = self.main_class.colours[i - 1]
             self.player_count_button.append(
                 tk.Label(master=self.player_box, width=2, height=1, bd=5, relief='ridge', text=i, font=main_class.font,
                          bg=main_colour, fg=secondary_colour))
@@ -163,7 +163,7 @@ class OptionsScreen():
         self.round_button = []
         self.round_box = tk.Frame(master=self.menu, height=150, width=700, bd=5, bg='blue',
                                   relief='ridge')
-        self.round_box.place(x=250, y=600, anchor=tk.CENTER)
+        self.round_box.place(x=250, y=525, anchor=tk.CENTER)
         for i in range(1, 6):
             self.round_button.append(
                 tk.Label(master=self.round_box, width=2, height=1, bd=5, relief='ridge', text=i, font=main_class.font,
@@ -173,17 +173,22 @@ class OptionsScreen():
                                                                self.round_button_clicked, i)
 
         self.round_text = tk.Label(master=self.menu, text='Rounds', font=main_class.sub_font, bg='blue', fg='yellow')
-        self.round_text.place(x=175, y=500)
+        self.round_text.place(x=175, y=425)
 
         self.start_button = tk.Label(master=self.menu, text='Start Game', height=1, relief='ridge', bd=3, width=9,
                                      bg='black', fg='yellow', font=main_class.small_font)
         self.start_button.bind('<Button-1>', self.game_start_check)
-        self.start_button.place(x=285, y=0)
+        self.start_button.place(x=285, y=570)
 
         self.exit_button_2 = tk.Label(master=self.menu, text='Exit', height=1, relief='ridge', bd=3, width=4,
                                       bg='black', fg='yellow', font=main_class.small_font)
         self.exit_button_2.bind('<Button-1>', self.menu_quit)
-        self.exit_button_2.place(x=425, y=700)
+        self.exit_button_2.place(x=425, y=570)
+
+        self.site_button = tk.Label(master=self.menu, text='shutthebox.club', height=1, relief='ridge', bd=4, width=13,
+                                    bg='black', fg='yellow', font=main_class.small_font)
+        self.site_button.place(x=10, y=570)
+        self.site_button.bind('<Button-1>', self.display_site)
 
         self.options_complete = True
 
@@ -222,6 +227,9 @@ class OptionsScreen():
     def display_rules(self, *args):
         wbopen('https://shutthebox.club/the-game/')
 
+    def display_site(self, *args):
+        wbopen('https://shutthebox.club/')
+
     def player_button_clicked(self, n):
         if type(n) == tk.Event:
             num = int(self.player_count_button.index(n.widget) + 1)
@@ -249,8 +257,9 @@ class OptionsScreen():
 
     def reset_colours(self):
         for i in range(11):
-            main_colour,secondary_colour = self.main_class.colours[i]
+            main_colour, secondary_colour = self.main_class.colours[i]
             self.player_count_button[i].config(fg=secondary_colour)
+
 
 class ShutTheBox():
     def __init__(self):
