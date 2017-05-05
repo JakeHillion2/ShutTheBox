@@ -2,7 +2,7 @@ import tkinter as tk
 import random, os, inspect, time, re, json, subprocess, sys
 import tkinter.simpledialog as simpledialog
 from tkinter import messagebox
-from urllib import request
+from urllib import request,parse
 from webbrowser import open as wbopen
 
 # Move Working Directory
@@ -13,7 +13,8 @@ os.chdir(dname)
 
 def has_internet(site='http://google.co.uk'):
     try:
-        request.urlopen(site, timeout=1)
+        _request = request.Request(site, headers={'User-Agent':'python'})
+        request.urlopen(_request, timeout=1)
         return (True)
     except:
         return (False)
@@ -58,52 +59,6 @@ if internet_connected and updates_enabled and has_internet(
                 cause_update()
             else:
                 break
-
-
-def std_dev(file_addr):
-    h_score, l_score = 0, 1000
-    if not (internet_connected and has_internet(file_addr + 'csv_stats/')):
-        return ((None, None, None, None))
-    try:
-        request.urlopen(file_addr + 'csv_stats/')
-    except:
-        return ((None, None, None, None))
-    with request.urlopen(file_addr + 'csv_stats/') as file:
-        _file = file.read().decode('utf-8')
-        _file = _file.split('\n')
-        _file.pop(0)
-        _file.pop(len(_file) - 1)
-        players = [[]] * 11
-        players = [list() for x in players]
-        for line in _file:
-            each_player = line.split(',')
-            i = -1
-            for each in each_player:
-                if i == -1:
-                    rounds = int(each)
-                else:
-                    players[i].append(int(each) / rounds)
-                    if h_score < int(each) and rounds == 5:
-                        h_score = int(each)
-                    if l_score > int(each) and rounds == 5:
-                        l_score = int(each)
-                i += 1
-    stdevs, averages = [], []
-    for player in players:
-        if len(player) == 0:
-            stdevs.append(None)
-            averages.append(None)
-        else:
-            fx, fx2, n = 0, 0, 0
-            for each in player:
-                fx += each
-                fx2 += each ** 2
-                n += 1
-            stdev = (fx2 / n - (fx / n) ** 2) ** 0.5
-            averages.append(fx / n)
-            stdevs.append(stdev)
-    return ((stdevs, averages, h_score, l_score))
-
 
 class OptionsScreen():
     def __init__(self, main_class):
@@ -277,13 +232,13 @@ class ShutTheBox():
             ['peru', 'black'],
             ['chartreuse', 'black']
         ]
-        self.debug = False
+        self.debug = True
         self.debug_nums = [6, 3, 6, 2, 6, 1, 6, 5, 4, 3, 2, 2, 6, 3, 6, 2, 6, 1, 6, 5, 4, 3, 2, 1]
         self.name_font = '-*-Microsoft Sans Serif-Normal-R-*--*-700-*-*-*-*-ISO8859-1'
         self.sub_font = '-*-Microsoft Sans Serif-Normal-R-*--*-400-*-*-*-*-ISO8859-1'
         self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
         self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-240-*-*-*-*-ISO8859-1'
-        self.log_address = 'http://188.166.170.12:5000/'
+        self.stats_location = 'https://stats.shutthebox.club/'
         # Initialise Some Variables
         self.single_dice_on = False
         self.player_turn = 0
@@ -400,6 +355,15 @@ class ShutTheBox():
         # Main Loop
         self.window.mainloop()
 
+    def gather_stats(self):
+        if not (internet_connected and has_internet(self.stats_location)):
+            if not has_internet(self.stats_location):
+                print('cannot connect to:',self.stats_location)
+            return ((None, None, None, None))
+        _request = request.Request(self.stats_location+'abbrv_stats/',headers={'User-Agent':'python'})
+        data = json.loads(request.urlopen(_request).read().decode('utf-8'))
+        return((data['stdev'],data['averages'],data['h_score'],data['l_score']))
+
     def close_window(self, x):
         if tk.messagebox.askokcancel('Exit Game', 'Are you sure you wish to exit?'):
             self.window.destroy()
@@ -417,6 +381,7 @@ class ShutTheBox():
         return ('ROUND ' + str(self.round) + ' OF ' + str(self.rounds))
 
     def single_dice_option(self, val):
+        self.single_dice_available = val
         if val:
             self.toggle_single_dice_checkbox.place(x=10, y=120)
         else:
@@ -564,9 +529,8 @@ class ShutTheBox():
                 self.throw_dice_button.config(fg='grey')
                 self.window.update()
                 os.system('say ' + win_colour + ' has won the game')
-                if internet_connected and has_internet(self.log_address):
-                    request.urlopen(self.log_address + 'upload_stats/' + '/'.join(
-                        [str(self.rounds)] + [str(x) for x in self.player_scores]))
+                if internet_connected and has_internet(self.stats_location):
+                    self.submit_stats('/'.join([str(self.rounds)] + [str(x) for x in self.player_scores]))
                 return (0)
         main_colour, secondary_colour = self.colours[self.player_turn - 1][0], self.colours[self.player_turn - 1][1]
         self.to_play_label.config(text=main_colour.upper() + ' TO PLAY', fg=main_colour)
@@ -583,6 +547,50 @@ class ShutTheBox():
         self.board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.throw_dice_button.config(fg=main_colour)
         self.window.update()
+
+    def submit_stats(self,web_args):
+        success = False
+        while not success:
+            u_name,p_word = self.get_login()
+            data = parse.urlencode({'username':u_name,'password':p_word}).encode()
+            url = self.stats_location+'submit/'+web_args
+            _request = request.Request(url,data=data,headers={'User-Agent':'python'})
+            response = request.urlopen(_request,timeout=1).read().decode()
+            success = json.loads(response)['was_success']
+            if success:
+                tk.messagebox.showinfo('Success','Successfully posted stats.',master=self.window)
+                return(1)
+            else:
+                retry = tk.messagebox.askretrycancel('Failure','Failed to post stats.',master=self.window)
+                if not retry:
+                    return(0)
+
+    def get_login(self):
+        sub_window = tk.Toplevel(master=self.window)
+
+        u_var,p_var = tk.StringVar(),tk.StringVar()
+        
+        u_name_box = tk.Entry(sub_window,textvariable=u_var)
+        p_word_box = tk.Entry(sub_window,textvariable=p_var,show='*')
+
+        def on_entry(*args):
+            sub_window.quit()
+            sub_window.destroy()
+
+        tk.Label(master=sub_window,text='Username:').pack(side='top')
+        u_name_box.pack(side='top')
+        tk.Label(master=sub_window,text='Password:').pack(side='top')
+        p_word_box.pack(side='top')
+        tk.Button(sub_window, command=on_entry, text = 'OK').pack(side = 'top')
+        
+        p_word_box.bind('<Return>', on_entry)
+        u_name_box.bind('<Return>', on_entry)
+
+        sub_window.lift()
+        sub_window.grab_set()
+        sub_window.mainloop()
+
+        return((u_var.get(),p_var.get()))
 
     def reset_board(self):
         main_colour, secondary_colour = self.colours[self.player_turn - 1][0], self.colours[self.player_turn - 1][1]
@@ -612,13 +620,13 @@ class ShutTheBox():
         pass
 
     def show_stats(self, x):
-        self.sub_window = tk.Tk()
+        self.sub_window = tk.Toplevel(master=self.window)
         self.sub_window_frame = tk.Frame(master=self.sub_window, height=540, width=295, bg='blue')
         self.sub_window_frame.pack()
         self.sub_window.wm_title("Shut The Box - Statistics")
         i = 0
         boxes = []
-        stdevs, averages, h_score, l_score = std_dev(self.log_address)
+        stdevs, averages, h_score, l_score = self.gather_stats()
         if ((stdevs is None) and (averages is None)) and ((h_score is None) and (l_score is None)):
             box = tk.Label(master=self.sub_window_frame, height=1, width=20, font=self.small_font,
                            text='No stats available.', fg='black', bg='white', relief='ridge')
@@ -653,6 +661,13 @@ class ShutTheBox():
         elif event.char.isnumeric():
             # Number Pressed, Press Number
             self.number_clicked_function(event.char)
+        elif event.char == 's':
+            print('s pressed')
+            if self.single_dice_available:
+                print('toggling single dice')
+                to_set = 1 if self.single_dice_var.get()==0 else 0
+                self.single_dice_var.set(to_set)
+                self.on_single_dice_change()
         else:
             print("pressed", repr(event.char))
 
