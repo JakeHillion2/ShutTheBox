@@ -232,7 +232,7 @@ class ShutTheBox():
             ['peru', 'black'],
             ['chartreuse', 'black']
         ]
-        self.debug = True
+        self.debug = False
         self.debug_nums = [6, 3, 6, 2, 6, 1, 6, 5, 4, 3, 2, 2, 6, 3, 6, 2, 6, 1, 6, 5, 4, 3, 2, 1]
         self.name_font = '-*-Microsoft Sans Serif-Normal-R-*--*-700-*-*-*-*-ISO8859-1'
         self.sub_font = '-*-Microsoft Sans Serif-Normal-R-*--*-400-*-*-*-*-ISO8859-1'
