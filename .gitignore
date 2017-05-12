@@ -1,6 +1,9 @@
 Score_Log.csv
 .DS_Store
 .disableupdates
+uuid.txt
+ShutTheBoxDev.py___jb_old___
+
 # Created by https://www.gitignore.io/api/python
 
 ### Python ###
