@@ -218,9 +218,23 @@ class OpeningScreen():
 class OnlineScreen():
     def __init__(self, opening_screen):
         self.base_url = 'https://mp.shutthebox.club/'
+        self.uuid_location = 'uuid.txt'
+
+        if os.access('/path/to/folder', os.W_OK):
+            if os.path.isfile(os.getenv('LOCALAPPDATA') + '\\Shut The Box\\uuid.txt'):
+                if not os.path.isdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box'):
+                    os.mkdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box')
+                self.uuid_location = os.getenv('LOCALAPPDATA') + '\\Shut The Box\\uuid.txt'
+            else:
+                self.uuid_location = 'uuid.txt'
+        else:
+            if not os.path.isdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box'):
+                os.mkdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box')
+            self.uuid_location = os.getenv('LOCALAPPDATA') + '\\Shut The Box\\uuid.txt'
+
         # grab a uuid
-        if os.path.isfile('uuid.txt'):
-            with open('uuid.txt', 'r') as file:
+        if os.path.isfile(self.uuid_location):
+            with open(self.uuid_location, 'r') as file:
                 old_id = file.read()
         else:
             old_id = None
@@ -232,7 +246,7 @@ class OnlineScreen():
         if new_id is None:
             new_id = get_request(self.base_url + '/serve_uuid/')
             print('new_id =', new_id)
-        with open('uuid.txt', 'w') as file:
+        with open(self.uuid_location, 'w') as file:
             file.write(new_id)
         self.new_id = new_id
         self.new_id_hash = sha256(self.new_id.encode('utf-8')).hexdigest()
