@@ -687,12 +687,16 @@ class OnlineGame():
         else:
             self.my_turn = False
         print('Change to:',change_to)
-        self.window.after(1200,self.next_turn,change_to)
+        self.window.after(1200, self.next_turn,change_to)
 
     def react_to_round_change(self, data):
         change_to = data['contents']['to_round']+1
-        self.next_round(change_to)
-        self.next_turn(0)
+        if 0 == self.my_colour:
+            self.my_turn = True
+        else:
+            self.my_turn = False
+        self.window.after(1200, self.next_round, change_to)
+        self.window.after(1200, self.next_turn, 0)
 
     def react_to_game_finished(self, data):
         x = data['contents']['winner']
