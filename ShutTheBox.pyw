@@ -1,5 +1,5 @@
 import tkinter as tk
-import random, os, time, re, json, subprocess, sys, math
+import random, os, time, re, json, subprocess, sys, math, platform
 from tkinter import messagebox
 from urllib import request, parse
 from webbrowser import open as wbopen
@@ -11,6 +11,10 @@ from tkinter import simpledialog
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
+
+if platform.system() == 'Windows':
+    import ctypes
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('JakeHillion.ShutTheBox')
 
 
 # Declare Top Level Functions
@@ -83,6 +87,7 @@ if internet_connected and updates_enabled and has_internet(
         print(each[0], ':', each[1])
         if each[0] > each[1]:
             temp_window = tk.Tk()
+            temp_window.iconbitmap('STB.ico')
             update_text = 'Your version of Shut The Box (' + version + ') is not the latest available version (' + latest_version + '). Do you wish to update the game?'
             result = tk.messagebox.askyesno('Update Available', update_text, master=temp_window)
             temp_window.destroy()
@@ -168,6 +173,7 @@ class ChatWindow():
 class OpeningScreen():
     def __init__(self):
         self.window = tk.Tk()
+        self.window.iconbitmap('STB.ico')
         self.window.wm_title("Shut The Box - Setup")
         self.decider_frame = tk.Frame(master=self.window, height=200, width=500, bg='blue')
         self.decider_frame.pack()
@@ -219,18 +225,6 @@ class OnlineScreen():
     def __init__(self, opening_screen):
         self.base_url = 'https://mp.shutthebox.club/'
         self.uuid_location = 'uuid.txt'
-
-        if os.access('/path/to/folder', os.W_OK):
-            if os.path.isfile(os.getenv('LOCALAPPDATA') + '\\Shut The Box\\uuid.txt'):
-                if not os.path.isdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box'):
-                    os.mkdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box')
-                self.uuid_location = os.getenv('LOCALAPPDATA') + '\\Shut The Box\\uuid.txt'
-            else:
-                self.uuid_location = 'uuid.txt'
-        else:
-            if not os.path.isdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box'):
-                os.mkdir(os.getenv('LOCALAPPDATA') + '\\Shut The Box')
-            self.uuid_location = os.getenv('LOCALAPPDATA') + '\\Shut The Box\\uuid.txt'
 
         # grab a uuid
         if os.path.isfile(self.uuid_location):
@@ -481,6 +475,7 @@ class OnlineGame():
 
         # Build The Window
         self.window = tk.Tk()
+        self.window.iconbitmap('STB.ico')
         self.window.protocol("WM_DELETE_WINDOW", self.close_window)
         self.main_frame = tk.Frame(master=self.window, height=600, width=800, bg='blue')
         self.window.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - " + version))
@@ -1100,6 +1095,7 @@ class OfflineGame():
         ###
         # Build The Window
         self.window = tk.Tk()
+        self.window.iconbitmap('STB.ico')
         self.main_frame = tk.Frame(master=self.window, height=600, width=800, bg='blue')
         self.window.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - " + version))
         self.selection_box = tk.Frame(master=self.main_frame, height=150, width=700, bd=10, bg='blue', relief='ridge')
