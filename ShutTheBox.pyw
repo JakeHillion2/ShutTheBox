@@ -467,6 +467,11 @@ class OnlineGame():
         self.time_offset = None
         self.r1, self.r2 = None, None
         self.my_turn = False
+        self.events_handled = 0
+        self.events = []
+
+        if self.my_colour == 0:
+            self.my_turn = True
 
         room_data = json.loads(get_request(self.base_url + '/view_room/' + self.game_id))
 
@@ -581,7 +586,7 @@ class OnlineGame():
             if self.time_offset is None:
                 self.time_offset = round((data['timecode'] - time.time())/1800)*1800
                 print(self.time_offset)
-            self.events = data['events']
+            self.events += data['events']
             if self.my_turn:
                 self.window.after(500, self.online_loop)
             else:
