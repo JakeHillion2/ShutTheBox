@@ -6,6 +6,7 @@ from webbrowser import open as wbopen
 from hashlib import sha256
 from urllib import error as url_error
 from tkinter import simpledialog
+from _tkinter import TclError
 
 # Move Working Directory
 abspath = os.path.abspath(__file__)
@@ -19,7 +20,7 @@ if platform.system() == 'Windows':
 
 # Set the Icon Location Constant
 if os.path.isfile('STB.ico'):
-    ICON_LOC = 'STB.ico'
+    ICON_LOC = dname + '/STB.ico'
 elif os.path.isfile('../STB.ico'):
     ICON_LOC = '../STB.ico'
 else:
@@ -96,7 +97,10 @@ if internet_connected and updates_enabled and has_internet(
         print(each[0], ':', each[1])
         if each[0] > each[1]:
             temp_window = tk.Tk()
-            temp_window.iconbitmap(ICON_LOC)
+            try:
+                temp_window.iconbitmap(ICON_LOC)
+            except TclError:
+                print('Your version of Python has errors relating to icons. An icon will not be used.')
             update_text = 'Your version of Shut The Box (' + version + ') is not the latest available version (' + latest_version + '). Do you wish to update the game?'
             result = tk.messagebox.askyesno('Update Available', update_text, master=temp_window)
             temp_window.destroy()
@@ -182,7 +186,10 @@ class ChatWindow():
 class OpeningScreen():
     def __init__(self):
         self.window = tk.Tk()
-        self.window.iconbitmap(ICON_LOC)
+        try:
+            self.window.iconbitmap(ICON_LOC)
+        except TclError:
+            print('Your version of Python has errors relating to icons. An icon will not be used.')
         self.window.wm_title("Shut The Box - Setup")
         self.decider_frame = tk.Frame(master=self.window, height=200, width=500, bg='blue')
         self.decider_frame.pack()
@@ -489,7 +496,10 @@ class OnlineGame():
 
         # Build The Window
         self.window = tk.Tk()
-        self.window.iconbitmap(ICON_LOC)
+        try:
+            self.window.iconbitmap(ICON_LOC)
+        except TclError:
+            print('Your version of Python has errors relating to icons. An icon will not be used.')
         self.window.protocol("WM_DELETE_WINDOW", self.close_window)
         self.main_frame = tk.Frame(master=self.window, height=600, width=800, bg='blue')
         self.window.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - " + version))
@@ -1109,7 +1119,10 @@ class OfflineGame():
         ###
         # Build The Window
         self.window = tk.Tk()
-        self.window.iconbitmap(ICON_LOC)
+        try:
+            self.window.iconbitmap(ICON_LOC)
+        except TclError:
+            print('Your version of Python has errors relating to icons. An icon will not be used.')
         self.main_frame = tk.Frame(master=self.window, height=600, width=800, bg='blue')
         self.window.wm_title("Shut The Box - DEBUG" if self.debug else ("Shut The Box - " + version))
         self.selection_box = tk.Frame(master=self.main_frame, height=150, width=700, bd=10, bg='blue', relief='ridge')
