@@ -111,6 +111,7 @@ if internet_connected and updates_enabled and has_internet(
 else:
     print("Updates will not be performed!")
 
+
 # Utility Classes
 class ChatWindow():
     def __init__(self, master, callback_function):
@@ -134,6 +135,7 @@ class ChatWindow():
         self.window.wm_title('Chat')
         self.main_frame = tk.Frame(master=self.window, width=300, height=600, bg='blue')
         self.main_frame.pack()
+        self.window.resizable(False, False)
 
         self.message_var = tk.StringVar()
         self.text_entry = tk.Entry(master=self.window, textvar=self.message_var)
@@ -202,7 +204,6 @@ class OpeningScreen():
         self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
         self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-240-*-*-*-*-ISO8859-1'
         self.italic_font = '-*-Microsoft Sans Serif-Normal-I-*--*-240-*-*-*-*-ISO8859-1'
-
 
         self.colours = [
             ['red', 'white'],
@@ -359,7 +360,8 @@ class OnlineScreen():
             self.round_button[len(self.round_button) - 1].bind('<Button-1>',
                                                                self.round_button_clicked, i)
 
-        self.round_text = tk.Label(master=self.create_room_frame, text='Rounds', font=self.opening_screen.font, bg='blue',
+        self.round_text = tk.Label(master=self.create_room_frame, text='Rounds', font=self.opening_screen.font,
+                                   bg='blue',
                                    fg='yellow')
         self.round_text.place(x=8, y=105)
 
@@ -605,12 +607,12 @@ class OnlineGame():
         # New Game Button
         self.new_game_button = tk.Label(master=self.main_frame, height=1, width=10, bd=3, bg='black', fg='yellow',
                                         relief='ridge', text='New Game', font=self.small_font)
-        #self.new_game_button.place(x=10, y=590, anchor=tk.SW)
+        # self.new_game_button.place(x=10, y=590, anchor=tk.SW)
         self.new_game_button.bind("<Button-1>", self.new_game)
         # End Turn Button
         self.end_turn_button = tk.Label(master=self.main_frame, height=1, width=8, bd=3, bg='black', fg='yellow',
                                         relief='ridge', text='End Turn', font=self.small_font)
-        self.end_turn_button.place(x=165, y=590, anchor=tk.SW)
+        # self.end_turn_button.place(x=165, y=590, anchor=tk.SW)
         self.end_turn_button.bind("<Button-1>", self.cause_server_vote)
         # Throw Dice Button
         self.throw_dice_button = tk.Label(master=self.main_frame, height=1, width=10, bd=3, bg='black', fg='yellow',
