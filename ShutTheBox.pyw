@@ -16,7 +16,7 @@ os.chdir(dname)
 if platform.system() == 'Windows':
     import ctypes
 
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('JakeHillion.ShutTheBox')
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Nero7634.ShutTheBox')
 
 # Set the Icon Location Constant
 if os.path.isfile('STB.ico'):
@@ -81,9 +81,9 @@ internet_connected = has_internet()
 updates_enabled = has_updates_enabled()
 
 if internet_connected and updates_enabled and has_internet(
-        'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'):
+        'https://api.github.com/repos/Nero7634/ShutTheBox/releases/latest'):
     print('Checking for updates...')
-    query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
+    query_address = 'https://api.github.com/repos/Nero7634/ShutTheBox/releases/latest'
     latest_version = json.loads(request.urlopen(query_address).read().decode('utf-8'))['tag_name']
     version_nums = re.findall(r'\d+', version)
     latest_version_nums = re.findall(r'\d+', latest_version)
@@ -108,7 +108,8 @@ if internet_connected and updates_enabled and has_internet(
                 cause_update()
             else:
                 break
-
+else:
+    print("Updates will not be performed!")
 
 # Utility Classes
 class ChatWindow():
@@ -319,8 +320,9 @@ class OnlineScreen():
     def do_create(self, *args):
         self.sub_font = '-*-Microsoft Sans Serif-Normal-R-*--*-150-*-*-*-*-ISO8859-1'
         self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
+        self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-200-*-*-*-*-ISO8859-1'
         self.online_frame.destroy()
-        self.create_room_frame = tk.Frame(master=self.window, height=400, width=500, bg='blue')
+        self.create_room_frame = tk.Frame(master=self.window, height=400, width=400, bg='blue')
         self.create_room_frame.pack()
 
         self.room_name_entry = tk.Entry(self.create_room_frame)
@@ -345,7 +347,7 @@ class OnlineScreen():
         self.round_button = []
         self.round_box = tk.Frame(master=self.create_room_frame, height=150, width=700, bd=5, bg='blue',
                                   relief='ridge')
-        self.round_box.place(x=200, y=200, anchor=tk.CENTER)
+        self.round_box.place(x=182, y=205, anchor=tk.CENTER)
         for i in range(1, 6):
             self.round_button.append(
                 tk.Label(master=self.round_box, width=2, height=1, bd=5, relief='ridge', text=i, font=self.font,
@@ -356,10 +358,10 @@ class OnlineScreen():
 
         self.round_text = tk.Label(master=self.create_room_frame, text='Rounds', font=self.opening_screen.font, bg='blue',
                                    fg='yellow')
-        self.round_text.place(x=175, y=150)
+        self.round_text.place(x=8, y=105)
 
         create_button = tk.Label(master=self.create_room_frame, text='Create Room', bg='black', fg='yellow',
-                                 font=self.opening_screen.font, relief='ridge', height=1, bd=3, width=11)
+                                 font=self.small_font, relief='ridge', height=1, bd=3, width=11)
         create_button.bind('<Button-1>', self.final_create)
         create_button.place(x=10, y=275)
 
