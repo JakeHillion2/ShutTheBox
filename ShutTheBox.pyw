@@ -293,14 +293,14 @@ class OnlineScreen():
 
         self.refresh_rooms_label = tk.Label(text='Refresh')
         self.refresh_rooms_label.bind('<Button-1>', self.refresh_rooms_label)
-        self.refresh_rooms_label.place(x=50,y=20)
+        self.refresh_rooms_label.place(x=50, y=20)
 
     def refresh_rooms(self, *args):
         self.window
         self.render_join_page()
 
     def render_join_page(self, *args):
-        jesus='-*-Microsoft Sans Serif-Normal-R-*--*-100-*-*-*-*-ISO8859-1'
+        jesus = '-*-Microsoft Sans Serif-Normal-R-*--*-100-*-*-*-*-ISO8859-1'
         if len(self.join_pages) == 0:
             return (None)
         page = self.join_pages[self.join_page]
@@ -565,6 +565,7 @@ class OnlineGame():
 
         # Build The Window
         self.window = tk.Tk()
+        self.window.resizable(False, False)
         try:
             self.window.iconbitmap(ICON_LOC)
         except TclError:
