@@ -426,7 +426,8 @@ class OnlineScreen():
         result = post_request(self.base_url + '/join_room/', data)
         success = json.loads(result)['success']
         if not success:
-            tk.messagebox.showerror('Room Not Joined', 'The room you wish to join is full.')
+            tk.messagebox.showerror('Room Not Joined', 'Unable to join room. It may be full or your password may be '
+                                                       'wrong.') 
             return (False)
         self.joined_room = room_id
         self.room_screen()
