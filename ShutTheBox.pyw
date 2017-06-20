@@ -291,7 +291,7 @@ class OnlineScreen():
         self.join_page = 0
         self.render_join_page()
 
-        self.refresh_rooms_label=tk.Label(tex='Refresh')
+        self.refresh_rooms_label=tk.Label(text='Refresh')
 
     def render_join_page(self, *args):
         if len(self.join_pages) == 0:
