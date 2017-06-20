@@ -317,7 +317,10 @@ class OnlineScreen():
             room_pass = tk.simpledialog.askstring('Password', 'Please enter the room password:')
         else:
             room_pass = None
-        nname = tk.simpledialog.askstring('Nickname', 'Please enter a nickname:')
+
+        nname = None
+        while nname is None or len(nname) > 16:
+            nname = tk.simpledialog.askstring('Nickname', 'Please enter a nickname (16 max):')
         self.final_join(event.widget['text'], nname, room_pass)
 
     def do_create(self, *args):
@@ -388,6 +391,10 @@ class OnlineScreen():
         if ' ' in name_entry:
             tk.messagebox.showerror('Room Not Created', 'Spaces are not allowed in room names!')
             return (False)
+        if ' ' in self.nickname_entry.get() or len(self.nickname_entry.get()) > 16:
+            tk.messagebox.showerror('Room Not Created!', 'Nickname too long')
+            return (False)
+
         pass_entry = self.room_pass_entry.get()
         nname_entry = self.nickname_entry.get()
         pass_entry = None if pass_entry == '' else pass_entry
