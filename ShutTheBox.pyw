@@ -17,7 +17,7 @@ os.chdir(dname)
 if platform.system() == 'Windows':
     import ctypes
 
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('ShutTheBox.ShutTheBox')
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('JakeHillion.ShutTheBox')
 
 # Set the Icon Location Constant
 if os.path.isfile('STB.ico'):
@@ -82,9 +82,9 @@ internet_connected = has_internet()
 updates_enabled = has_updates_enabled()
 
 if internet_connected and updates_enabled and has_internet(
-        'https://api.github.com/repos/ShutTheBox/ShutTheBox/releases/latest'):
+        'https://api.github.com/repos/JakeHillion/ShutTheBox/releases/latest'):
     print('Checking for updates...')
-    query_address = 'https://api.github.com/repos/ShutTheBox/ShutTheBox/releases/latest'
+    query_address = 'https://api.github.com/repos/JakeHillion/ShutTheBox/releases/latest'
     latest_version = json.loads(request.urlopen(query_address).read().decode('utf-8'))['tag_name']
     version_nums = re.findall(r'\d+', version)
     latest_version_nums = re.findall(r'\d+', latest_version)
