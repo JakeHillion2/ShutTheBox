@@ -398,6 +398,9 @@ class OnlineScreen():
         if ' ' in name_entry:
             tk.messagebox.showerror('Room Not Created', 'Spaces are not allowed in room names!')
             return (False)
+        if len(name_entry) > 16:
+            tk.messagebox.showerror('Room Not Created!', 'Room name too long')
+            return False
         if ' ' in self.nickname_entry.get() or len(self.nickname_entry.get()) > 16:
             tk.messagebox.showerror('Room Not Created!', 'Nickname too long')
             return (False)
