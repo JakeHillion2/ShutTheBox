@@ -65,7 +65,7 @@ def get_request(address, headers=None):
     return (response)
 
 
-def pagerise(x, per=10):
+def pagerise(x, per=10000):
     pages = int(math.ceil(len(x) / per))
     output = []
     for i in range(pages):
