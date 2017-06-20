@@ -9,6 +9,7 @@ from tkinter import simpledialog
 from _tkinter import TclError
 
 # Move Working Directory
+ACTIVE_SYMBOL = '✕'
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
@@ -692,7 +693,7 @@ class OnlineGame():
 
     def clear_number(self, data):
         num = data['contents']['number']
-        self.selection_buttons[num - 1].config(text='X')
+        self.selection_buttons[num - 1].config(text=ACTIVE_SYMBOL)
         self.number_labels[num - 1].config(text='', bg='grey')
 
     def enable_throw_dice(self, data):
@@ -1256,7 +1257,7 @@ class OfflineGame():
             if num in self.acceptable_inputs[0]:
                 self.acceptable_inputs[0].remove(num)
                 self.acceptable_inputs = [[None, None], self.acceptable_inputs[0][0]]
-                self.selection_buttons[num - 1].config(text='X')
+                self.selection_buttons[num - 1].config(text=ACTIVE_SYMBOL)
                 self.number_labels[num - 1].config(text='', bg='grey')
                 self.player_scores[self.player_turn - 1] += num
                 self.board.remove(num)
@@ -1267,7 +1268,7 @@ class OfflineGame():
                 self.awaiting_number = False
                 self.throw_dice_button.bind("<Button-1>", self.throw_dice_animation)
                 self.throw_dice_button.config(fg='yellow')
-                self.selection_buttons[num - 1].config(text='X')
+                self.selection_buttons[num - 1].config(text=ACTIVE_SYMBOL)
                 self.number_labels[num - 1].config(text='', bg='grey')
                 self.player_scores[self.player_turn - 1] += num
                 self.board.remove(num)
