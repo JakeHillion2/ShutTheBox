@@ -16,8 +16,8 @@ os.chdir(dname)
 
 if platform.system() == 'Windows':
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('JakeHillion.ShutTheBox')
 
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('ShutTheBox.ShutTheBox')
 
 # Set the Icon Location Constant
 if os.path.isfile('STB.ico'):
@@ -66,7 +66,7 @@ def get_request(address, headers=None):
     return (response)
 
 
-def pagerise(x, per=10):
+def pagerise(x, per=10000):
     pages = int(math.ceil(len(x) / per))
     output = []
     for i in range(pages):
@@ -82,9 +82,9 @@ internet_connected = has_internet()
 updates_enabled = has_updates_enabled()
 
 if internet_connected and updates_enabled and has_internet(
-        'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'):
+        'https://api.github.com/repos/ShutTheBox/ShutTheBox/releases/latest'):
     print('Checking for updates...')
-    query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
+    query_address = 'https://api.github.com/repos/ShutTheBox/ShutTheBox/releases/latest'
     latest_version = json.loads(request.urlopen(query_address).read().decode('utf-8'))['tag_name']
     version_nums = re.findall(r'\d+', version)
     latest_version_nums = re.findall(r'\d+', latest_version)
@@ -109,6 +109,8 @@ if internet_connected and updates_enabled and has_internet(
                 cause_update()
             else:
                 break
+else:
+    print("Updates will not be performed!")
 
 
 # Utility Classes
@@ -134,9 +136,10 @@ class ChatWindow():
         self.window.wm_title('Chat')
         self.main_frame = tk.Frame(master=self.window, width=300, height=600, bg='blue')
         self.main_frame.pack()
+        self.window.resizable(False, False)
 
         self.message_var = tk.StringVar()
-        self.text_entry = tk.Entry(master=self.window,textvar=self.message_var)
+        self.text_entry = tk.Entry(master=self.window, textvar=self.message_var)
         self.text_entry.pack(side=tk.BOTTOM, fill=tk.X)
         self.text_entry.bind('<Return>', self.send_message)
 
@@ -156,7 +159,7 @@ class ChatWindow():
         self.window.withdraw()
         self.window.protocol("WM_DELETE_WINDOW", self.hide_window)
 
-        #self.window.mainloop()
+        # self.window.mainloop()
 
     def add_message(self, sender, message):
         self.text.config(state='normal')
@@ -165,7 +168,7 @@ class ChatWindow():
         self.text.see(tk.END)
         self.text.config(state='disabled')
 
-    def add_fc_message(self,message,tag):
+    def add_fc_message(self, message, tag):
         self.text.config(state='normal')
         self.text.insert(tk.END, message, tag.replace(" ", "") + '1')
         self.text.see(tk.END)
@@ -289,19 +292,28 @@ class OnlineScreen():
         self.join_page = 0
         self.render_join_page()
 
+        self.refresh_rooms_label = tk.Label(text='Refresh')
+        self.refresh_rooms_label.bind('<Button-1>', self.refresh_rooms_label)
+        self.refresh_rooms_label.place(x=50, y=20)
+
+    def refresh_rooms(self, *args):
+        self.window
+        self.render_join_page()
+
     def render_join_page(self, *args):
+        jesus = '-*-Microsoft Sans Serif-Normal-R-*--*-100-*-*-*-*-ISO8859-1'
         if len(self.join_pages) == 0:
             return (None)
         page = self.join_pages[self.join_page]
-        self.in_room_frame = tk.Frame(master=self.window, height=800, width=500, bg='blue')
+        self.in_room_frame = tk.Frame(master=self.window, height=1080, width=500, bg='blue')
         self.in_room_frame.pack()
         page_labels = []
         i = 0
         for each in page:
             new = tk.Label(master=self.in_room_frame, text=each['identifier'], width=15, height=2,
-                           font=self.opening_screen.small_font, bg='black', fg='yellow', relief='ridge', bd=3)
+                           font=jesus, bg='black', fg='yellow', relief='ridge', bd=3)
             new.bind('<Button-1>', self.click_join_button)
-            new.place(x=20, y=50 + 75 * i)
+            new.place(x=20, y=50 + 45 * i)
             page_labels.append(new)
             i += 1
 
@@ -313,25 +325,73 @@ class OnlineScreen():
             room_pass = tk.simpledialog.askstring('Password', 'Please enter the room password:')
         else:
             room_pass = None
-        nname = tk.simpledialog.askstring('Nickname', 'Please enter a nickname:')
+
+        nname = None
+        while nname is None or len(nname) > 16:
+            nname = tk.simpledialog.askstring('Nickname', 'Please enter a nickname (16 max):')
         self.final_join(event.widget['text'], nname, room_pass)
 
     def do_create(self, *args):
+        self.sub_font = '-*-Microsoft Sans Serif-Normal-R-*--*-150-*-*-*-*-ISO8859-1'
+        self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
+        self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-200-*-*-*-*-ISO8859-1'
         self.online_frame.destroy()
-        self.create_room_frame = tk.Frame(master=self.window, height=400, width=500, bg='blue')
+        self.create_room_frame = tk.Frame(master=self.window, height=400, width=400, bg='blue')
         self.create_room_frame.pack()
 
         self.room_name_entry = tk.Entry(self.create_room_frame)
-        self.room_name_entry.place(x=10, y=20)
+        self.room_name_entry.place(x=130, y=17)
         self.room_pass_entry = tk.Entry(self.create_room_frame, show='*')
-        self.room_pass_entry.place(x=10, y=50)
+        self.room_pass_entry.place(x=130, y=50)
         self.nickname_entry = tk.Entry(self.create_room_frame)
-        self.nickname_entry.place(x=10, y=80)
+        self.nickname_entry.place(x=130, y=83)
+
+        self.room_name_label = tk.Label(master=self.create_room_frame, text='Room Name', fg='yellow', bg='blue',
+                                        font=self.sub_font)
+        self.room_name_label.place(x=8, y=15)
+        self.room_pass_label = tk.Label(master=self.create_room_frame, text='Room Password', fg='yellow', bg='blue',
+                                        font=self.sub_font)
+        self.room_pass_label.place(x=8, y=47)
+        self.your_nickname_label = tk.Label(master=self.create_room_frame, text='Your Nickname', fg='yellow', bg='blue',
+                                            font=self.sub_font)
+        self.your_nickname_label.place(x=8, y=79)
+
+        # Round Boxes
+        self.rounds = 0
+        self.round_button = []
+        self.round_box = tk.Frame(master=self.create_room_frame, height=150, width=700, bd=5, bg='blue',
+                                  relief='ridge')
+        self.round_box.place(x=182, y=205, anchor=tk.CENTER)
+        for i in range(1, 6):
+            self.round_button.append(
+                tk.Label(master=self.round_box, width=2, height=1, bd=5, relief='ridge', text=i, font=self.font,
+                         bg='black', fg='yellow'))
+            self.round_button[len(self.round_button) - 1].grid(row=0, column=i)
+            self.round_button[len(self.round_button) - 1].bind('<Button-1>',
+                                                               self.round_button_clicked, i)
+
+        self.round_text = tk.Label(master=self.create_room_frame, text='Rounds', font=self.opening_screen.font,
+                                   bg='blue',
+                                   fg='yellow')
+        self.round_text.place(x=8, y=105)
 
         create_button = tk.Label(master=self.create_room_frame, text='Create Room', bg='black', fg='yellow',
-                                 font=self.opening_screen.font, relief='ridge', height=1, bd=3, width=11)
+                                 font=self.small_font, relief='ridge', height=1, bd=3, width=11)
         create_button.bind('<Button-1>', self.final_create)
-        create_button.place(x=10, y=350)
+        create_button.place(x=10, y=275)
+
+    def round_button_clicked(self, n):
+        if type(n) == tk.Event:
+            num = int(self.round_button.index(n.widget) + 1)
+        else:
+            num = int(n)
+        self.round_select(num)
+
+    def round_select(self, num):
+        if not self.rounds == None:
+            self.round_button[self.rounds - 1].config(fg='yellow')
+        self.round_button[num - 1].config(fg='grey')
+        self.rounds = num
 
     def final_create(self, *args):
         reasons = {'RNE': 'The room name you entered has already been used!'}
@@ -339,6 +399,13 @@ class OnlineScreen():
         if ' ' in name_entry:
             tk.messagebox.showerror('Room Not Created', 'Spaces are not allowed in room names!')
             return (False)
+        if len(name_entry) > 16:
+            tk.messagebox.showerror('Room Not Created!', 'Room name too long')
+            return False
+        if ' ' in self.nickname_entry.get() or len(self.nickname_entry.get()) > 16:
+            tk.messagebox.showerror('Room Not Created!', 'Nickname too long')
+            return (False)
+
         pass_entry = self.room_pass_entry.get()
         nname_entry = self.nickname_entry.get()
         pass_entry = None if pass_entry == '' else pass_entry
@@ -360,7 +427,8 @@ class OnlineScreen():
         result = post_request(self.base_url + '/join_room/', data)
         success = json.loads(result)['success']
         if not success:
-            tk.messagebox.showerror('Room Not Joined', 'The room you wish to join is full.')
+            tk.messagebox.showerror('Room Not Joined', 'Unable to join room. It may be full or your password may be '
+                                                       'wrong.') 
             return (False)
         self.joined_room = room_id
         self.room_screen()
@@ -368,7 +436,7 @@ class OnlineScreen():
     def room_screen(self):
         try:
             if not 'room_screen_frame' in list(self.__dict__.keys()):
-                self.room_screen_frame = tk.Frame(master=self.window, height=600, width=300, bg='blue')
+                self.room_screen_frame = tk.Frame(master=self.window, height=600, width=315, bg='blue')
                 self.room_screen_frame.pack()
                 label1 = tk.Label(master=self.room_screen_frame, text='Leave Game', width=10, height=1,
                                   font=self.opening_screen.small_font, bg='black', fg='yellow', relief='ridge', bd=3)
@@ -419,6 +487,7 @@ class OnlineScreen():
         data = {'uuid': self.new_id, 'room_data': json.dumps({'room_name': self.joined_room})}
         post_request(self.base_url + '/leave_room/', data)
         self.room_screen_frame.destroy()
+        self.window.destroy()
         self.opening_screen.__init__()
 
     def start_game(self):
@@ -497,6 +566,7 @@ class OnlineGame():
 
         # Build The Window
         self.window = tk.Tk()
+        self.window.resizable(False, False)
         try:
             self.window.iconbitmap(ICON_LOC)
         except TclError:
@@ -544,7 +614,7 @@ class OnlineGame():
         self.round_label = tk.Label(master=self.main_frame, height=1, text='ROUND 1 OF 5', font=self.small_font,
                                     bg='blue', fg='red')
         self.round_label.place(x=440, y=140, anchor=tk.CENTER)
-        # Exit Button
+        #Exit Button
         self.exit_button = tk.Label(master=self.main_frame, height=1, width=6, bd=3, bg='black', fg='yellow',
                                     relief='ridge', text='Exit', font=self.small_font)
         self.exit_button.place(x=790, y=590, anchor=tk.SE)
@@ -552,12 +622,12 @@ class OnlineGame():
         # New Game Button
         self.new_game_button = tk.Label(master=self.main_frame, height=1, width=10, bd=3, bg='black', fg='yellow',
                                         relief='ridge', text='New Game', font=self.small_font)
-        self.new_game_button.place(x=10, y=590, anchor=tk.SW)
+        # self.new_game_button.place(x=10, y=590, anchor=tk.SW)
         self.new_game_button.bind("<Button-1>", self.new_game)
         # End Turn Button
         self.end_turn_button = tk.Label(master=self.main_frame, height=1, width=8, bd=3, bg='black', fg='yellow',
                                         relief='ridge', text='End Turn', font=self.small_font)
-        self.end_turn_button.place(x=165, y=590, anchor=tk.SW)
+        # self.end_turn_button.place(x=165, y=590, anchor=tk.SW)
         self.end_turn_button.bind("<Button-1>", self.cause_server_vote)
         # Throw Dice Button
         self.throw_dice_button = tk.Label(master=self.main_frame, height=1, width=10, bd=3, bg='black', fg='yellow',
@@ -571,7 +641,7 @@ class OnlineGame():
         self.show_stats_button.bind("<Button-1>", self.show_stats)
         # Open Chat Button
         self.open_chat_button = tk.Label(master=self.main_frame, height=1, width=10, bd=3, bg='black', fg='yellow',
-                                          relief='ridge', text='Open Chat', font=self.small_font)
+                                         relief='ridge', text='Open Chat', font=self.small_font)
         self.open_chat_button.place(x=530, y=590, anchor=tk.SE)
         self.open_chat_button.bind("<Button-1>", self.open_chat)
         # Single Dice Mode Checkbox
@@ -601,10 +671,11 @@ class OnlineGame():
 
     def online_loop(self):
         try:
-            data = json.loads(get_request(self.base_url+'/view_events/' + self.game_id + '/' + str(self.last_score_gathered)))
+            data = json.loads(
+                get_request(self.base_url + '/view_events/' + self.game_id + '/' + str(self.last_score_gathered)))
             self.last_score_gathered = data['timecode']
             if self.time_offset is None:
-                self.time_offset = round((data['timecode'] - time.time())/1800)*1800
+                self.time_offset = round((data['timecode'] - time.time()) / 1800) * 1800
                 print(self.time_offset)
             self.events.update(data['events'])
             if self.my_turn:
@@ -612,7 +683,7 @@ class OnlineGame():
             else:
                 self.window.after(1000, self.online_loop)
             if len(self.events) > 0:
-                self.window.after(2,self.offline_loop)
+                self.window.after(2, self.offline_loop)
         except Exception as e:
             print(e)
             self.window.after(1000, self.online_loop)
@@ -622,23 +693,25 @@ class OnlineGame():
         if len(keys_to_process) == 0:
             if len(self.events) > 0:
                 self.window.after(10, self.offline_loop)
-            return(None)
+            return (None)
         keys_to_process = sorted(keys_to_process, key=float)
         process_key = keys_to_process[0]
         event = self.events.pop(process_key)
         event = json.loads(event)
-        print('Handling',event)
+        print('Handling', event)
         self.reactions[event['type']](event)
         if len(self.events) > 0:
-            self.window.after(10,self.offline_loop)
+            self.window.after(10, self.offline_loop)
 
     def send_server_event(self, event, details=None):
         if details is None:
             details = {}
-        post_request(self.base_url + '/event_from_client/', {'event': event, 'uuid': self.uuid, 'details':json.dumps(details), 'room_id':self.game_id})
+        post_request(self.base_url + '/event_from_client/',
+                     {'event': event, 'uuid': self.uuid, 'details': json.dumps(details), 'room_id': self.game_id})
 
     def close_window(self, x=None):
-        if tk.messagebox.askokcancel('Exit Game', 'Are you sure you wish to exit? You will not be able to reconnect to this game.'):
+        if tk.messagebox.askokcancel('Exit Game',
+                                     'Are you sure you wish to exit? You will not be able to reconnect to this game. All players will be foreced to leave the Game'):
             try:
                 self.disconnect()
             except:
@@ -649,23 +722,23 @@ class OnlineGame():
         data = {'uuid': self.uuid, 'room_data': json.dumps({'room_name': self.game_id})}
         post_request(self.base_url + '/leave_room/', data)
 
-    def open_chat(self,x):
+    def open_chat(self, x):
         self.chat_window.show_window()
 
     # To Server Event Management
     def inform_server_of_chat(self, chat):
-        self.send_server_event('NCM',{'message':chat})
+        self.send_server_event('NCM', {'message': chat})
 
-    def cause_server_vote(self,x):
+    def cause_server_vote(self, x):
         self.send_server_event('TEV')
 
-    def tell_server_dice_throw(self,x=None):
+    def tell_server_dice_throw(self, x=None):
         self.send_server_event('DCT')
 
-    def on_single_dice_change(self,x=None):
+    def on_single_dice_change(self, x=None):
         if self.single_dice_var.get() == 1:
             print('Toggling single dice mode on')
-            self.send_server_event('SDM',{'state': True})
+            self.send_server_event('SDM', {'state': True})
         else:
             print('Toggling single dice mode off')
             self.send_server_event('SDM', {'state': False})
@@ -679,16 +752,25 @@ class OnlineGame():
 
     # From Server Event Management
     def react_to_text_chat(self, data):
-        self.chat_window.add_message(self.colours[data['contents']['sender']][0],data['contents']['message'])
+        self.chat_window.add_message(self.colours[data['contents']['sender']][0], data['contents']['message'])
 
     def refresh_uuid(self, data):
         result = post_request(self.base_url + '/refresh_uuid/', {'uuid': self.uuid})
         print('UUID Refreshed' if json.loads(result)['success'] else 'UUID Refresh Failed')
 
     def player_left(self, data):
-        self.chat_window.add_fc_message(self.colours[data['contents']['colour']][0]+' has left the game.',self.colours[data['contents']['colour']][0])
+        self.chat_window.add_fc_message(self.colours[data['contents']['colour']][0] + ' has left the game.',
+                                        self.colours[data['contents']['colour']][0])
 
-    def set_throw_dice_results(self,data):
+        tk.messagebox.showerror('Game Ended!', 'A player quit the game, so it is ending!')
+        self.chat_window.window.destroy()
+        try:
+            self.sub_window.destroy()
+        except AttributeError:
+            print("Stats window did not exist! Continuing...")
+        self.window.destroy()
+
+    def set_throw_dice_results(self, data):
         self.r1, self.r2 = data['contents']['number1'], data['contents']['number2']
 
     def clear_number(self, data):
@@ -706,11 +788,11 @@ class OnlineGame():
             self.my_turn = True
         else:
             self.my_turn = False
-        print('Change to:',change_to)
-        self.window.after(1200, self.next_turn,change_to)
+        print('Change to:', change_to)
+        self.window.after(1200, self.next_turn, change_to)
 
     def react_to_round_change(self, data):
-        change_to = data['contents']['to_round']+1
+        change_to = data['contents']['to_round'] + 1
         if 0 == self.my_colour:
             self.my_turn = True
         else:
@@ -725,7 +807,7 @@ class OnlineGame():
     def react_to_scores(self, data):
         self.player_scores = data['contents']['scores']
         for i in range(0, len(self.score_labels)):
-            self.score_labels[i].config(text=self.player_scores[i-1])
+            self.score_labels[i].config(text=self.player_scores[i - 1])
         self.window.update()
 
     # Base Functions
@@ -746,7 +828,7 @@ class OnlineGame():
         self.throw_dice_button.config(fg=main_colour)
         self.window.update()
 
-    def game_finished(self,x):
+    def game_finished(self, x):
         win_colour = self.colours[x][0]
         self.to_play_label.config(text=win_colour.upper() + ' WINS', fg=win_colour)
         self.round_label.config(fg=win_colour)
@@ -771,7 +853,7 @@ class OnlineGame():
         for i in range(1, 10):
             self.number_labels[i - 1].config(text=i, bg='black')
 
-    def new_game(self,x):
+    def new_game(self, x):
         self.close_window(None)
         self.opening_screen.__init__()
 
@@ -916,7 +998,7 @@ class OfflineScreen():
         self.name_font = '-*-Microsoft Sans Serif-Normal-R-*--*-700-*-*-*-*-ISO8859-1'
         self.sub_font = '-*-Microsoft Sans Serif-Normal-R-*--*-400-*-*-*-*-ISO8859-1'
         self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-240-*-*-*-*-ISO8859-1'
-        self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
+        self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-425-*-*-*-*-ISO8859-1'
 
         self.menu.wm_title("Shut The Box - Setup")
         self.options_menu_frame = tk.Frame(master=self.menu, height=615, width=500, bg='blue')
