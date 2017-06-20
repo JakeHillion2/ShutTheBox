@@ -598,7 +598,7 @@ class OnlineGame():
         # New Game Button
         self.new_game_button = tk.Label(master=self.main_frame, height=1, width=10, bd=3, bg='black', fg='yellow',
                                         relief='ridge', text='New Game', font=self.small_font)
-        self.new_game_button.place(x=10, y=590, anchor=tk.SW)
+        #self.new_game_button.place(x=10, y=590, anchor=tk.SW)
         self.new_game_button.bind("<Button-1>", self.new_game)
         # End Turn Button
         self.end_turn_button = tk.Label(master=self.main_frame, height=1, width=8, bd=3, bg='black', fg='yellow',
