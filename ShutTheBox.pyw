@@ -612,7 +612,7 @@ class OnlineGame():
         self.round_label = tk.Label(master=self.main_frame, height=1, text='ROUND 1 OF 5', font=self.small_font,
                                     bg='blue', fg='red')
         self.round_label.place(x=440, y=140, anchor=tk.CENTER)
-        # Exit Button
+        #Exit Button
         self.exit_button = tk.Label(master=self.main_frame, height=1, width=6, bd=3, bg='black', fg='yellow',
                                     relief='ridge', text='Exit', font=self.small_font)
         self.exit_button.place(x=790, y=590, anchor=tk.SE)
@@ -709,7 +709,7 @@ class OnlineGame():
 
     def close_window(self, x=None):
         if tk.messagebox.askokcancel('Exit Game',
-                                     'Are you sure you wish to exit? You will not be able to reconnect to this game.'):
+                                     'Are you sure you wish to exit? You will not be able to reconnect to this game. All players will be foreced to leave the Game'):
             try:
                 self.disconnect()
             except:
