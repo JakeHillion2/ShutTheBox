@@ -761,6 +761,14 @@ class OnlineGame():
         self.chat_window.add_fc_message(self.colours[data['contents']['colour']][0] + ' has left the game.',
                                         self.colours[data['contents']['colour']][0])
 
+        tk.messagebox.showerror('Game Ended!', 'A player quit the game, so it is ending!')
+        self.chat_window.window.destroy()
+        try:
+            self.sub_window.destroy()
+        except AttributeError:
+            print("Stats window did not exist! Continuing...")
+        self.window.destroy()
+
     def set_throw_dice_results(self, data):
         self.r1, self.r2 = data['contents']['number1'], data['contents']['number2']
 
