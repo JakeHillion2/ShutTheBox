@@ -291,9 +291,16 @@ class OnlineScreen():
         self.join_page = 0
         self.render_join_page()
 
-        self.refresh_rooms_label=tk.Label(text='Refresh')
+        self.refresh_rooms_label = tk.Label(text='Refresh')
+        self.refresh_rooms_label.bind('<Button-1>', self.refresh_rooms_label)
+        self.refresh_rooms_label.place(x=50,y=20)
+
+    def refresh_rooms(self, *args):
+        self.window
+        self.render_join_page()
 
     def render_join_page(self, *args):
+        jesus='-*-Microsoft Sans Serif-Normal-R-*--*-100-*-*-*-*-ISO8859-1'
         if len(self.join_pages) == 0:
             return (None)
         page = self.join_pages[self.join_page]
@@ -303,9 +310,9 @@ class OnlineScreen():
         i = 0
         for each in page:
             new = tk.Label(master=self.in_room_frame, text=each['identifier'], width=15, height=2,
-                           font=self.opening_screen.small_font, bg='black', fg='yellow', relief='ridge', bd=3)
+                           font=jesus, bg='black', fg='yellow', relief='ridge', bd=3)
             new.bind('<Button-1>', self.click_join_button)
-            new.place(x=20, y=50 + 75 * i)
+            new.place(x=20, y=50 + 45 * i)
             page_labels.append(new)
             i += 1
 
