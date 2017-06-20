@@ -10,7 +10,7 @@ if (os.path.basename(dname)!='Shut The Box') and (os.path.basename(dname)!='pkgs
     os.chdir('Shut The Box')
     dname = os.getcwd()
 
-query_address = 'https://api.github.com/repos/JakeHillion2/ShutTheBox/releases/latest'
+query_address = 'https://api.github.com/repos/Nero7634/ShutTheBox/releases/latest'
 query_info = json.loads(request.urlopen(query_address).read().decode('utf-8'))
 
 tarball_url = query_info['tarball_url']
