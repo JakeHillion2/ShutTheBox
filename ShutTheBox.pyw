@@ -282,9 +282,16 @@ class OnlineScreen():
         self.create_button.bind('<Button-1>', self.do_create)
         self.create_button.place(x=270, y=50)
 
+
         self.window.mainloop()
 
+    def refresh_list(self, *args):
+        self.in_room_frame.destroy()
+        self.do_join()
+        print('Attempted to do something')
+
     def do_join(self, *args):
+        self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-200-*-*-*-*-ISO8859-1'
         self.online_frame.destroy()
         content = get_request(self.base_url + '/available_rooms/')
         self.available_rooms = json.loads(content)
@@ -292,30 +299,32 @@ class OnlineScreen():
         self.join_page = 0
         self.render_join_page()
 
-        self.refresh_rooms_label = tk.Label(text='Refresh')
-        self.refresh_rooms_label.bind('<Button-1>', self.refresh_rooms_label)
-        self.refresh_rooms_label.place(x=50, y=20)
-
-    def refresh_rooms(self, *args):
-        self.window
-        self.render_join_page()
+        self.refresh_label = tk.Label(master=self.window, text='Refresh',font=self.small_font,bg='black',fg='yellow',relief='ridge',height=1,width=7)
+        self.refresh_label.place(x=20, y=10)
+        self.refresh_label.bind('<Button-1>', self.refresh_list)
 
     def render_join_page(self, *args):
-        jesus = '-*-Microsoft Sans Serif-Normal-R-*--*-100-*-*-*-*-ISO8859-1'
-        if len(self.join_pages) == 0:
-            return (None)
-        page = self.join_pages[self.join_page]
-        self.in_room_frame = tk.Frame(master=self.window, height=1080, width=500, bg='blue')
+        jesus = '-*-Microsoft Sans Serif-Normal-R-*--*-140-*-*-*-*-ISO8859-1'
+        # if len(self.join_pages) == 0:
+        #     return (None)
+        try:
+            page = self.join_pages[self.join_page]
+        except:
+            pass
+        self.in_room_frame = tk.Frame(master=self.window, height=500, width=500, bg='blue')
         self.in_room_frame.pack()
-        page_labels = []
-        i = 0
-        for each in page:
-            new = tk.Label(master=self.in_room_frame, text=each['identifier'], width=15, height=2,
-                           font=jesus, bg='black', fg='yellow', relief='ridge', bd=3)
-            new.bind('<Button-1>', self.click_join_button)
-            new.place(x=20, y=50 + 45 * i)
-            page_labels.append(new)
-            i += 1
+        try:
+            i = 0
+            self.page_labels = []
+            for each in page:
+                new = tk.Label(master=self.in_room_frame, text=each['identifier'], width=15, height=2,
+                               font=jesus, bg='black', fg='yellow', relief='ridge', bd=3)
+                new.bind('<Button-1>', self.click_join_button)
+                new.place(x=20, y=50 + 45 * i)
+                self.page_labels.append(new)
+                i += 1
+        except:
+            pass
 
     def click_join_button(self, event):
         print(event.widget['text'])
@@ -336,7 +345,7 @@ class OnlineScreen():
         self.font = '-*-Microsoft Sans Serif-Normal-R-*--*-480-*-*-*-*-ISO8859-1'
         self.small_font = '-*-Microsoft Sans Serif-Normal-R-*--*-200-*-*-*-*-ISO8859-1'
         self.online_frame.destroy()
-        self.create_room_frame = tk.Frame(master=self.window, height=400, width=400, bg='blue')
+        self.create_room_frame = tk.Frame(master=self.window, height=175, width=400, bg='blue')
         self.create_room_frame.pack()
 
         self.room_name_entry = tk.Entry(self.create_room_frame)
@@ -356,29 +365,29 @@ class OnlineScreen():
                                             font=self.sub_font)
         self.your_nickname_label.place(x=8, y=79)
 
-        # Round Boxes
-        self.rounds = 0
-        self.round_button = []
-        self.round_box = tk.Frame(master=self.create_room_frame, height=150, width=700, bd=5, bg='blue',
-                                  relief='ridge')
-        self.round_box.place(x=182, y=205, anchor=tk.CENTER)
-        for i in range(1, 6):
-            self.round_button.append(
-                tk.Label(master=self.round_box, width=2, height=1, bd=5, relief='ridge', text=i, font=self.font,
-                         bg='black', fg='yellow'))
-            self.round_button[len(self.round_button) - 1].grid(row=0, column=i)
-            self.round_button[len(self.round_button) - 1].bind('<Button-1>',
-                                                               self.round_button_clicked, i)
-
-        self.round_text = tk.Label(master=self.create_room_frame, text='Rounds', font=self.opening_screen.font,
-                                   bg='blue',
-                                   fg='yellow')
-        self.round_text.place(x=8, y=105)
+        # # Round Boxes
+        # self.rounds = 0
+        # self.round_button = []
+        # self.round_box = tk.Frame(master=self.create_room_frame, height=150, width=700, bd=5, bg='blue',
+        #                           relief='ridge')
+        # self.round_box.place(x=182, y=205, anchor=tk.CENTER)
+        # for i in range(1, 6):
+        #     self.round_button.append(
+        #         tk.Label(master=self.round_box, width=2, height=1, bd=5, relief='ridge', text=i, font=self.font,
+        #                  bg='black', fg='yellow'))
+        #     self.round_button[len(self.round_button) - 1].grid(row=0, column=i)
+        #     self.round_button[len(self.round_button) - 1].bind('<Button-1>',
+        #                                                        self.round_button_clicked, i)
+        #
+        # self.round_text = tk.Label(master=self.create_room_frame, text='Rounds', font=self.opening_screen.font,
+        #                            bg='blue',
+        #                            fg='yellow')
+        # self.round_text.place(x=8, y=105)
 
         create_button = tk.Label(master=self.create_room_frame, text='Create Room', bg='black', fg='yellow',
                                  font=self.small_font, relief='ridge', height=1, bd=3, width=11)
         create_button.bind('<Button-1>', self.final_create)
-        create_button.place(x=10, y=275)
+        create_button.place(x=10, y=125)
 
     def round_button_clicked(self, n):
         if type(n) == tk.Event:
@@ -428,7 +437,7 @@ class OnlineScreen():
         success = json.loads(result)['success']
         if not success:
             tk.messagebox.showerror('Room Not Joined', 'Unable to join room. It may be full or your password may be '
-                                                       'wrong.') 
+                                                       'wrong.')
             return (False)
         self.joined_room = room_id
         self.room_screen()
@@ -614,7 +623,7 @@ class OnlineGame():
         self.round_label = tk.Label(master=self.main_frame, height=1, text='ROUND 1 OF 5', font=self.small_font,
                                     bg='blue', fg='red')
         self.round_label.place(x=440, y=140, anchor=tk.CENTER)
-        #Exit Button
+        # Exit Button
         self.exit_button = tk.Label(master=self.main_frame, height=1, width=6, bd=3, bg='black', fg='yellow',
                                     relief='ridge', text='Exit', font=self.small_font)
         self.exit_button.place(x=790, y=590, anchor=tk.SE)
