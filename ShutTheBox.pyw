@@ -801,7 +801,7 @@ class OnlineGame():
         self.window.after(1200, self.next_turn, 0)
 
     def react_to_game_finished(self, data):
-        x = data['contents']['winner']
+        x = self.player_scores.index(max(self.player_scores))
         self.game_finished(x)
 
     def react_to_scores(self, data):
@@ -830,12 +830,12 @@ class OnlineGame():
 
     def game_finished(self, x):
         win_colour = self.colours[x][0]
-        self.to_play_label.config(text=win_colour.upper() + ' WINS', fg=win_colour)
+        # self.to_play_label.config(text=win_colour.upper() + ' WINS', fg=win_colour)
+        self.to_play_label.config(text='GAME OVER!')
         self.round_label.config(fg=win_colour)
         self.throw_dice_button.bind("<Button-1>", self.do_nothing)
         self.throw_dice_button.config(fg='grey')
         self.window.update()
-        os.system('say ' + win_colour + ' has won the game')
 
     def next_round(self, x):
         self.player_turn = 0
